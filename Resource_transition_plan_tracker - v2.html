@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SA Resource Transition Plan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f5f2;
+    --color-background-tertiary: #efefeb;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #6b6b67;
+    --color-text-tertiary: #9a9a96;
+    --color-border-tertiary: rgba(0,0,0,0.12);
+    --color-border-secondary: rgba(0,0,0,0.22);
+    --color-border-primary: rgba(0,0,0,0.35);
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1e1e1c;
+      --color-background-secondary: #2a2a28;
+      --color-background-tertiary: #242422;
+      --color-text-primary: #f0ede8;
+      --color-text-secondary: #9a9a96;
+      --color-text-tertiary: #6b6b67;
+      --color-border-tertiary: rgba(255,255,255,0.1);
+      --color-border-secondary: rgba(255,255,255,0.18);
+      --color-border-primary: rgba(255,255,255,0.28);
+    }
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-tertiary);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .app { padding: 0; }
+  .header { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; overflow: hidden; min-height: 76px; }
+  .header-copy { flex: 1; position: relative; z-index: 1; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+  .header-watermark {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(42px, 7vw, 96px);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #a32d2d;
+    opacity: 0.12;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    line-height: 1;
+  }
+  .meta-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .hidden { display: none !important; }
+  .meta-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .meta-card label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+  .meta-card span { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .meta-card input, .meta-card select { font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; width: 100%; font-family: var(--font-sans); }
+  .tabs { display: flex; gap: 4px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+  .tab { padding: 8px 14px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-sans); }
+  .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+  .tab:hover:not(.active) { color: var(--color-text-primary); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .section-head h2 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .btn { padding: 7px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .table-wrap { overflow-x: auto; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; background: var(--color-background-secondary); }
+  th:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
+  th:last-child { border-radius: 0 var(--border-radius-lg) 0 0; }
+  td { padding: 9px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--color-background-secondary); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-todo { background: #D3D1C7; color: #444441; }
+  .badge-in-progress { background: #B5D4F4; color: #0C447C; }
+  .badge-done { background: #C0DD97; color: #27500A; }
+  .badge-blocked { background: #F7C1C1; color: #791F1F; }
+  .badge-high { background: #F7C1C1; color: #791F1F; }
+  .badge-medium { background: #FAC775; color: #633806; }
+  .badge-low { background: #C0DD97; color: #27500A; }
+  .progress-bar-wrap { background: var(--color-background-secondary); border-radius: 20px; height: 6px; width: 100%; min-width: 60px; }
+  .progress-bar-fill { height: 6px; border-radius: 20px; background: #1D9E75; transition: width 0.3s; }
+  .select-cell { background: transparent; border: none; font-size: 12px; font-family: var(--font-sans); color: var(--color-text-primary); cursor: pointer; outline: none; width: 100%; }
+  .day-grid { display: flex; flex-direction: column; gap: 1rem; }
+  .day-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .day-controls label { font-size: 12px; color: var(--color-text-secondary); }
+  .day-controls input, .day-controls select { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); padding: 6px 8px; font-size: 12px; font-family: var(--font-sans); }
+  .day-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 8px; }
+  .day-chip { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); padding: 8px 6px; font-size: 12px; cursor: pointer; text-align: center; }
+  .day-chip:hover { background: var(--color-background-secondary); }
+  .day-chip.selected { border-color: #1D9E75; background: rgba(29,158,117,0.12); color: #0f6a4f; font-weight: 500; }
+  .day-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .day-num { width: 32px; height: 32px; border-radius: 50%; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--color-text-primary); flex-shrink: 0; }
+  .day-num.today { background: #1D9E75; color: #fff; }
+  .day-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .day-phase { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+  .day-tasks { display: flex; flex-direction: column; gap: 6px; }
+  .day-task-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--border-radius-md); background: var(--color-background-secondary); font-size: 13px; }
+  .day-task-item input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+  .day-task-label { flex: 1; }
+  .day-task-label.done { text-decoration: line-through; color: var(--color-text-tertiary); }
+  .notes-input { width: 100%; margin-top: 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 12px; color: var(--color-text-primary); background: var(--color-background-secondary); font-family: var(--font-sans); resize: none; outline: none; }
+  .notes-input:focus { border-color: var(--color-border-primary); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .modal { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 85vh; overflow-y: auto; }
+  .modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 7px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-primary); outline: none; }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .chart-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .chart-title { font-size: 14px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 580px) { .two-col { grid-template-columns: 1fr; } .summary-row { grid-template-columns: repeat(2,1fr); } }
+  .owner-tag { font-size: 11px; background: var(--color-background-secondary); border-radius: 20px; padding: 2px 8px; color: var(--color-text-secondary); display: inline-block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .plans-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .table-caption { font-size: 13px; color: var(--color-text-secondary); margin: 0.25rem 0 0.5rem; }
+  .mini-table th, .mini-table td { font-size: 12px; padding: 8px 10px; }
+  @media (max-width: 780px) {
+    .plans-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="app">
+  <div class="header">
+    <div class="header-copy">
+      <h1>Resource transition plan</h1>
+      <p>Structured onboarding and handover tracker</p>
+    </div>
+    <div id="headerDemoLabel" class="header-watermark hidden">Demo</div>
+    <div class="header-actions">
+      <button id="homeBtn" class="btn btn-sm hidden" onclick="goHome()">Home</button>
+      <button id="demoBtn" class="btn btn-sm" onclick="openDemoWindow()">Demo</button>
+      <button id="exportPlanBtn" class="btn btn-sm hidden" onclick="exportCurrentPlanHtml()">Export Plan</button>
+      <button id="backToPlansBtn" class="btn btn-sm hidden" onclick="backToPlans()">Back to Plans</button>
+    </div>
+  </div>
+
+  <div class="meta-row" id="trackerMetaRow">
+    <div class="meta-card"><label>Outgoing SA</label><input id="m-outgoing" value="" /></div>
+    <div class="meta-card"><label>Incoming SA</label><input id="m-incoming" value="" /></div>
+    <div class="meta-card"><label>Start date</label><input id="m-start" type="date" value="" /></div>
+    <div class="meta-card"><label>End date</label><input id="m-end" type="date" value="" /></div>
+    <div class="meta-card"><label>Project / Account</label><input id="m-project" value="" /></div>
+    <div class="meta-card"><label>Status</label>
+      <select id="m-status" class="select-cell" style="font-size:13px;">
+        <option>Planning</option><option>In Progress</option><option>On Hold</option><option>Completed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="plans" onclick="switchTab('plans',this)">Plans</button>
+    <button class="tab hidden" data-tab="progress" onclick="switchTab('progress',this)">Progress &amp; charts</button>
+    <button class="tab hidden" data-tab="tasks" onclick="switchTab('tasks',this)">Task list</button>
+    <button class="tab hidden" data-tab="daily" onclick="switchTab('daily',this)">Day-by-day</button>
+  </div>
+
+  <!-- PLANS PANEL -->
+  <div class="panel active" id="tab-plans">
+    <div class="section-head">
+      <h2>Plan setup and portfolio</h2>
+      <button class="btn btn-primary" onclick="createPlanFromForm()">Create plan</button>
+    </div>
+
+    <div class="plans-grid">
+      <div class="chart-wrap">
+        <div class="chart-title">Create transition plan</div>
+        <div class="two-col" style="grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="form-group" style="margin:0;"><label>Outgoing SA</label><input id="p-outgoing" value="" /></div>
+          <div class="form-group" style="margin:0;"><label>Incoming SA</label><input id="p-incoming" value="" /></div>
+          <div class="form-group" style="margin:0;"><label>Project / Account</label><input id="p-project" value="" /></div>
+          <div class="form-group" style="margin:0;"><label>Initial status</label>
+            <select id="p-status">
+              <option>Planning</option>
+              <option>In Progress</option>
+              <option>On Hold</option>
+              <option>Completed</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;"><label>Start date</label><input id="p-start" type="date" value="" /></div>
+          <div class="form-group" style="margin:0;"><label>End date</label><input id="p-end" type="date" value="" /></div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Ongoing plans by status</div>
+        <div style="position:relative;width:100%;height:260px;"><canvas id="ongoingStatusChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="table-caption">Scheduled plans (future start date)</div>
+    <div class="table-wrap" style="margin-bottom:1rem;">
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Combination</th>
+            <th>Project</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th style="width:90px;">Add task</th>
+            <th style="width:80px;">Open</th>
+            <th style="width:80px;">Delete</th>
+          </tr>
+        </thead>
+        <tbody id="scheduledPlansBody"></tbody>
+      </table>
+    </div>
+
+    <div id="ongoingPlansSection">
+    <div class="table-caption">Ongoing plans</div>
+    <div class="table-wrap">
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Combination</th>
+            <th>Project</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th style="width:90px;">Add task</th>
+            <th style="width:80px;">Open</th>
+            <th style="width:80px;">Delete</th>
+          </tr>
+        </thead>
+        <tbody id="ongoingPlansBody"></tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+
+  <!-- TASKS PANEL -->
+  <div class="panel" id="tab-tasks">
+    <div class="section-head">
+      <h2>Transition tasks</h2>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Add task</button>
+    </div>
+    <div class="table-wrap">
+      <table id="taskTable">
+        <thead>
+          <tr>
+            <th style="width:32px;">#</th>
+            <th>Task</th>
+            <th>Phase</th>
+            <th>Owner</th>
+            <th>Priority</th>
+            <th>Due day</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th style="width:80px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DAILY PANEL -->
+  <div class="panel" id="tab-daily">
+    <div class="section-head">
+      <h2>Day-by-day tracker</h2>
+      <div class="day-controls">
+        <label for="dailyDatePicker">Calendar</label>
+        <input id="dailyDatePicker" type="date" onchange="onDailyDateChange(this.value)" />
+        <label for="dailyDaySelect">Day</label>
+        <select id="dailyDaySelect" onchange="setSelectedDay(parseInt(this.value,10))"></select>
+      </div>
+    </div>
+    <div class="day-grid" id="dayGrid"></div>
+  </div>
+
+  <!-- PROGRESS PANEL -->
+  <div class="panel" id="tab-progress">
+    <div class="summary-row" id="summaryRow"></div>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Tasks by status</div>
+        <div style="position:relative;width:100%;height:220px;"><canvas id="statusChart"></canvas></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Tasks by phase</div>
+        <div style="position:relative;width:100%;height:220px;"><canvas id="phaseChart"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Daily completion burn-up</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#1D9E75;"></span>Completed tasks</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#B5D4F4;"></span>Total tasks</span>
+      </div>
+      <div style="position:relative;width:100%;height:240px;"><canvas id="burnChart"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Progress by phase</div>
+      <div style="position:relative;width:100%;height:240px;"><canvas id="barChart"></canvas></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PLAN TASK MODAL -->
+<div class="modal-overlay" id="planTaskModalOverlay" style="display:none;" onclick="if(event.target===this)closePlanTaskModal()">
+  <div class="modal">
+    <h3 id="planTaskModalTitle">Add task to plan</h3>
+    <div class="form-group"><label>Task name</label><input id="pt-name" placeholder="e.g. Stakeholder introduction meeting" /></div>
+    <div class="form-group"><label>Phase</label>
+      <select id="pt-phase">
+        <option>Week 1 — Orientation</option>
+        <option>Week 2 — Shadowing</option>
+        <option>Week 3 — Handover</option>
+        <option>Week 4 — Supervised delivery</option>
+        <option>Week 5–6 — Independent delivery</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Owner</label>
+      <select id="pt-owner">
+        <option>Outgoing SA</option>
+        <option>Incoming SA</option>
+        <option>Both</option>
+        <option>Manager</option>
+      </select>
+    </div>
+    <div class="two-col" style="grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group" style="margin:0;"><label>Priority</label><select id="pt-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+      <div class="form-group" style="margin:0;"><label>Due day</label><input id="pt-day" type="number" min="1" max="60" value="1" /></div>
+    </div>
+    <div class="form-group" style="margin-top:10px;"><label>Notes</label><textarea id="pt-notes" placeholder="Optional task notes"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closePlanTaskModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePlanTask()">Add task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle">Add task</h3>
+    <div class="form-group"><label>Task name</label><input id="f-name" placeholder="e.g. Handover architecture diagrams" /></div>
+    <div class="form-group"><label>Phase</label>
+      <select id="f-phase">
+        <option>Week 1 — Orientation</option>
+        <option>Week 2 — Shadowing</option>
+        <option>Week 3 — Handover</option>
+        <option>Week 4 — Supervised delivery</option>
+        <option>Week 5–6 — Independent delivery</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Owner</label>
+      <select id="f-owner">
+        <option>Outgoing SA</option>
+        <option>Incoming SA</option>
+        <option>Both</option>
+        <option>Manager</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Priority</label>
+      <select id="f-priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+    </div>
+    <div class="form-group"><label>Due day</label>
+      <input id="f-day" type="number" min="1" max="30" placeholder="e.g. 3" />
+    </div>
+    <div class="form-group"><label>Status</label>
+      <select id="f-status"><option>To-do</option><option>In progress</option><option>Done</option><option>Blocked</option></select>
+    </div>
+    <div class="form-group"><label>Progress (%)</label>
+      <input id="f-progress" type="number" min="0" max="100" value="0" />
+    </div>
+    <div class="form-group"><label>Notes</label><textarea id="f-notes" placeholder="Optional notes or links"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save task</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const demoTasks = [
+  {id:1,name:'Introduce incoming SA to all key stakeholders',phase:'Week 1 — Orientation',owner:'Outgoing SA',priority:'High',day:1,status:'Done',progress:100,notes:'Schedule 1:1s with client leads, project managers, and devs'},
+  {id:2,name:'Review current architecture documentation',phase:'Week 1 — Orientation',owner:'Incoming SA',priority:'High',day:2,status:'Done',progress:100,notes:'AWS architecture diagrams, C4 models, ADRs'},
+  {id:3,name:'Access provisioning — all tools and systems',phase:'Week 1 — Orientation',owner:'Manager',priority:'High',day:1,status:'Done',progress:100,notes:'AWS, Jira, Confluence, Slack, GitHub'},
+  {id:4,name:'Walkthrough of open RFCs and decisions',phase:'Week 1 — Orientation',owner:'Outgoing SA',priority:'Medium',day:3,status:'In progress',progress:60,notes:''},
+  {id:5,name:'Shadow client meetings and calls',phase:'Week 2 — Shadowing',owner:'Incoming SA',priority:'High',day:6,status:'In progress',progress:40,notes:''},
+  {id:6,name:'Review runbooks and incident playbooks',phase:'Week 2 — Shadowing',owner:'Incoming SA',priority:'High',day:7,status:'To-do',progress:0,notes:''},
+  {id:7,name:'Technical deep-dive: cloud infra and pipelines',phase:'Week 2 — Shadowing',owner:'Both',priority:'High',day:8,status:'To-do',progress:0,notes:''},
+  {id:8,name:'Handover client relationship ownership',phase:'Week 3 — Handover',owner:'Outgoing SA',priority:'High',day:11,status:'To-do',progress:0,notes:'Introduce as new primary SA contact'},
+  {id:9,name:'Transfer backlog and sprint planning responsibilities',phase:'Week 3 — Handover',owner:'Both',priority:'Medium',day:12,status:'To-do',progress:0,notes:''},
+  {id:10,name:'Review and update all architecture docs',phase:'Week 3 — Handover',owner:'Incoming SA',priority:'High',day:14,status:'To-do',progress:0,notes:''},
+  {id:11,name:'Lead first client architecture review independently',phase:'Week 4 — Supervised delivery',owner:'Incoming SA',priority:'High',day:16,status:'To-do',progress:0,notes:'Outgoing SA available as backup'},
+  {id:12,name:'Outgoing SA available for questions (async)',phase:'Week 4 — Supervised delivery',owner:'Outgoing SA',priority:'Medium',day:17,status:'To-do',progress:0,notes:''},
+  {id:13,name:'Handover final documentation and credentials',phase:'Week 5–6 — Independent delivery',owner:'Outgoing SA',priority:'High',day:22,status:'To-do',progress:0,notes:''},
+  {id:14,name:'Transition completion sign-off',phase:'Week 5–6 — Independent delivery',owner:'Manager',priority:'High',day:30,status:'To-do',progress:0,notes:'Formal sign-off from manager and client'},
+];
+let tasks = [];
+let nextId = 1;
+let editId = null;
+let selectedDay = null;
+let currentPlanId = null;
+let isPlanSelected = false;
+let taskModalPlanId = null;
+let isDemoMode = false;
+const isDemoPopupMode = new URLSearchParams(window.location.search).get('demo') === '1';
+
+const phases = ['Week 1 — Orientation','Week 2 — Shadowing','Week 3 — Handover','Week 4 — Supervised delivery','Week 5–6 — Independent delivery'];
+const owners = ['Outgoing SA','Incoming SA','Both','Manager'];
+const priorities = ['High','Medium','Low'];
+const statuses = ['To-do','In progress','Done','Blocked'];
+
+const statusBadge = s => {
+  const map = {'To-do':'badge-todo','In progress':'badge-in-progress','Done':'badge-done','Blocked':'badge-blocked'};
+  return `<span class="badge ${map[s]||'badge-todo'}">${s}</span>`;
+};
+const prioBadge = p => {
+  const map = {'High':'badge-high','Medium':'badge-medium','Low':'badge-low'};
+  return `<span class="badge ${map[p]||'badge-medium'}">${p}</span>`;
+};
+
+let statusChart, phaseChart, burnChart, barChart;
+let ongoingStatusChart;
+const APP_STORAGE_KEY = 'saTransitionPlannerStateV1';
+
+function openDemoWindow() {
+  const baseUrl = window.location.href.split('?')[0];
+  const popup = window.open(`${baseUrl}?demo=1`, 'saTransitionDemo', 'width=1400,height=900,resizable=yes,scrollbars=yes');
+  if(!popup) {
+    alert('Popup was blocked. Please allow popups for this page and try again.');
+  }
+}
+
+const todayIso = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const toDate = (dateStr) => {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
+const demoPlans = [
+  { id: 1, outgoing: 'Alex Thompson', incoming: 'Jordan Lee', project: 'Enterprise Cloud Migration', start: '2026-04-07', end: '2026-05-16', status: 'In Progress', progress: 38 },
+  { id: 2, outgoing: 'Maya Brown', incoming: 'Chris Walker', project: 'Data Platform Stabilization', start: '2026-05-20', end: '2026-06-25', status: 'Planning', progress: 0 },
+  { id: 3, outgoing: 'Sam Reed', incoming: 'Avery King', project: 'Legacy App Decommission', start: '2026-03-15', end: '2026-04-25', status: 'In Progress', progress: 52 }
+];
+let plans = [];
+let nextPlanId = 1;
+const taskTemplate = tasks.map(({ id, ...rest }) => ({ ...rest, status: 'To-do', progress: 0 }));
+let planTaskStore = {};
+
+function loadDemoData() {
+  isDemoMode = true;
+  plans = demoPlans.map(p => ({ ...p }));
+  nextPlanId = Math.max(...plans.map(p => p.id)) + 1;
+
+  const seededTasks = demoTasks.map((t, idx) => ({ ...t, id: idx + 1 }));
+  tasks = seededTasks.map(t => ({ ...t }));
+  nextId = Math.max(...seededTasks.map(t => t.id)) + 1;
+  planTaskStore = { 1: seededTasks.map(t => ({ ...t })) };
+
+  document.getElementById('p-outgoing').value = demoPlans[0].outgoing;
+  document.getElementById('p-incoming').value = demoPlans[0].incoming;
+  document.getElementById('p-project').value = demoPlans[0].project;
+  document.getElementById('p-start').value = demoPlans[0].start;
+  document.getElementById('p-end').value = demoPlans[0].end;
+  document.getElementById('p-status').value = 'In Progress';
+
+  currentPlanId = null;
+  isPlanSelected = false;
+  updateTrackerVisibility();
+  switchTab('plans');
+  renderPlansPanel();
+  persistAppState();
+}
+
+function goHome() {
+  if(isDemoPopupMode) {
+    window.close();
+    return;
+  }
+
+  isDemoMode = false;
+  currentPlanId = null;
+  isPlanSelected = false;
+  selectedDay = null;
+
+  plans = [];
+  tasks = [];
+  planTaskStore = {};
+  nextPlanId = 1;
+  nextId = 1;
+
+  document.getElementById('m-outgoing').value = '';
+  document.getElementById('m-incoming').value = '';
+  document.getElementById('m-project').value = '';
+  document.getElementById('m-start').value = '';
+  document.getElementById('m-end').value = '';
+  document.getElementById('m-status').value = 'Planning';
+
+  document.getElementById('p-outgoing').value = '';
+  document.getElementById('p-incoming').value = '';
+  document.getElementById('p-project').value = '';
+  document.getElementById('p-start').value = '';
+  document.getElementById('p-end').value = '';
+  document.getElementById('p-status').value = 'Planning';
+
+  updateTrackerVisibility();
+  switchTab('plans');
+  renderAll();
+}
+
+function persistAppState() {
+  if(isDemoPopupMode) return;
+
+  try {
+    const activeTab = document.querySelector('.tab.active')?.dataset?.tab || 'plans';
+    const state = {
+      plans,
+      planTaskStore,
+      nextPlanId,
+      nextId,
+      currentPlanId,
+      isPlanSelected,
+      isDemoMode,
+      selectedDay,
+      activeTab
+    };
+    localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // Ignore storage errors in restricted browser contexts.
+  }
+}
+
+function loadPersistedState() {
+  if(isDemoPopupMode) return false;
+
+  try {
+    const raw = localStorage.getItem(APP_STORAGE_KEY);
+    if(!raw) return false;
+
+    const state = JSON.parse(raw);
+    if(!state || typeof state !== 'object') return false;
+
+    plans = Array.isArray(state.plans) ? state.plans : [];
+    planTaskStore = state.planTaskStore && typeof state.planTaskStore === 'object' ? state.planTaskStore : {};
+    nextPlanId = Number.isInteger(state.nextPlanId) ? state.nextPlanId : 1;
+    nextId = Number.isInteger(state.nextId) ? state.nextId : 1;
+    currentPlanId = state.currentPlanId ?? null;
+    isPlanSelected = Boolean(state.isPlanSelected);
+    isDemoMode = Boolean(state.isDemoMode);
+    selectedDay = Number.isInteger(state.selectedDay) ? state.selectedDay : null;
+
+    if(currentPlanId && planTaskStore[currentPlanId]) {
+      tasks = planTaskStore[currentPlanId].map(t => ({ ...t }));
+      const currentPlan = plans.find(p => p.id === currentPlanId);
+      if(currentPlan) {
+        document.getElementById('m-outgoing').value = currentPlan.outgoing || '';
+        document.getElementById('m-incoming').value = currentPlan.incoming || '';
+        document.getElementById('m-project').value = currentPlan.project || '';
+        document.getElementById('m-start').value = currentPlan.start || '';
+        document.getElementById('m-end').value = currentPlan.end || '';
+        document.getElementById('m-status').value = currentPlan.status || 'Planning';
+      } else {
+        currentPlanId = null;
+        isPlanSelected = false;
+        tasks = [];
+      }
+    } else {
+      currentPlanId = null;
+      isPlanSelected = false;
+      tasks = [];
+    }
+
+    if(plans.length) {
+      const first = plans[0];
+      document.getElementById('p-outgoing').value = first.outgoing || '';
+      document.getElementById('p-incoming').value = first.incoming || '';
+      document.getElementById('p-project').value = first.project || '';
+      document.getElementById('p-start').value = first.start || '';
+      document.getElementById('p-end').value = first.end || '';
+      document.getElementById('p-status').value = first.status || 'Planning';
+    }
+
+    renderAll();
+    updateTrackerVisibility();
+    switchTab(isPlanSelected ? (state.activeTab || 'progress') : 'plans');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function exportCurrentPlanHtml() {
+  const plan = plans.find(p => p.id === currentPlanId);
+  if(!plan) {
+    alert('Open a plan before exporting.');
+    return;
+  }
+
+  const planTasks = (planTaskStore[currentPlanId] || tasks || []).map(t => ({ ...t }));
+  const esc = (v) => String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  const rows = planTasks.map((t, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td>${esc(t.name)}</td>
+      <td>${esc(t.phase)}</td>
+      <td>${esc(t.owner)}</td>
+      <td>${esc(t.priority)}</td>
+      <td>Day ${esc(t.day)}</td>
+      <td>${esc(t.status)}</td>
+      <td>${esc(t.progress)}%</td>
+      <td>${esc(t.notes || '')}</td>
+    </tr>
+  `).join('');
+
+  const exportedAt = new Date().toLocaleString();
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transition Plan Export</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; background:#f5f5f2; margin:0; padding:24px; color:#1a1a18; }
+    .wrap { max-width:1200px; margin:0 auto; background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px; }
+    h1 { margin:0 0 6px; font-size:24px; }
+    .meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:16px 0 18px; }
+    .card { background:#f5f5f2; border-radius:8px; padding:10px 12px; }
+    .label { font-size:11px; color:#6b6b67; text-transform:uppercase; letter-spacing:.05em; }
+    .val { font-size:14px; font-weight:600; margin-top:3px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { border:1px solid #e3e3dd; padding:8px 10px; text-align:left; vertical-align:top; }
+    th { background:#f5f5f2; }
+    .small { font-size:12px; color:#6b6b67; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Resource Transition Plan</h1>
+    <div class="small">Exported: ${esc(exportedAt)}</div>
+    <div class="meta">
+      <div class="card"><div class="label">Outgoing SA</div><div class="val">${esc(plan.outgoing)}</div></div>
+      <div class="card"><div class="label">Incoming SA</div><div class="val">${esc(plan.incoming)}</div></div>
+      <div class="card"><div class="label">Project</div><div class="val">${esc(plan.project)}</div></div>
+      <div class="card"><div class="label">Start Date</div><div class="val">${esc(plan.start)}</div></div>
+      <div class="card"><div class="label">End Date</div><div class="val">${esc(plan.end)}</div></div>
+      <div class="card"><div class="label">Status</div><div class="val">${esc(plan.status)}</div></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Task</th><th>Phase</th><th>Owner</th><th>Priority</th><th>Due</th><th>Status</th><th>Progress</th><th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const safeOutgoing = (plan.outgoing || 'outgoing').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+  const safeIncoming = (plan.incoming || 'incoming').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `transition-plan-${safeOutgoing}-to-${safeIncoming}.html`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function classifyPlanStatus(plan) {
+  const today = toDate(todayIso());
+  const start = toDate(plan.start);
+  const end = toDate(plan.end);
+
+  if(plan.status === 'Completed') return 'Completed';
+  if(plan.status === 'On Hold') return 'On Hold';
+  if(start > today) return 'Planning';
+  if(end < today) return 'Overdue';
+  return 'In Progress';
+}
+
+function renderPlansPanel() {
+  const scheduledBody = document.getElementById('scheduledPlansBody');
+  const ongoingBody = document.getElementById('ongoingPlansBody');
+  const ongoingSection = document.getElementById('ongoingPlansSection');
+  if(!scheduledBody || !ongoingBody) return;
+
+  const today = toDate(todayIso());
+  const scheduled = plans.filter(p => toDate(p.start) > today);
+  const ongoing = plans.filter(p => toDate(p.start) <= today && toDate(p.end) >= today && p.status !== 'Completed');
+
+  if(ongoingSection) {
+    ongoingSection.style.display = ongoing.length ? 'block' : 'none';
+  }
+
+  scheduledBody.innerHTML = scheduled.length ? scheduled.map(p => `
+    <tr>
+      <td>${p.outgoing} → ${p.incoming}</td>
+      <td>${p.project}</td>
+      <td>${p.start}</td>
+      <td>${p.end}</td>
+      <td>${classifyPlanStatus(p)}</td>
+      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
+      <td><button class="btn btn-sm" onclick="openPlan(${p.id})">Open</button></td>
+      <td><button class="btn btn-sm" style="color:#a32d2d;" onclick="deletePlan(${p.id})">Del</button></td>
+    </tr>
+  `).join('') : `<tr><td colspan="8" style="color:var(--color-text-secondary);">No scheduled plans.</td></tr>`;
+
+  ongoingBody.innerHTML = ongoing.length ? ongoing.map(p => `
+    <tr>
+      <td>${p.outgoing} → ${p.incoming}</td>
+      <td>${p.project}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;max-width:180px;">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${p.progress}%;"></div></div>
+          <span style="font-size:11px;color:var(--color-text-tertiary);min-width:26px;">${p.progress}%</span>
+        </div>
+      </td>
+      <td>${classifyPlanStatus(p)}</td>
+      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
+      <td><button class="btn btn-sm" onclick="openPlan(${p.id})">Open</button></td>
+      <td><button class="btn btn-sm" style="color:#a32d2d;" onclick="deletePlan(${p.id})">Del</button></td>
+    </tr>
+  `).join('') : `<tr><td colspan="7" style="color:var(--color-text-secondary);">No ongoing plans.</td></tr>`;
+
+  const ongoingStatusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0 };
+  ongoing.forEach(p => {
+    const status = classifyPlanStatus(p);
+    if(ongoingStatusCounts[status] !== undefined) ongoingStatusCounts[status] += 1;
+  });
+
+  const totalOngoing = Object.values(ongoingStatusCounts).reduce((sum, value) => sum + value, 0);
+  const chartLabels = totalOngoing === 0 ? ['No ongoing plans'] : Object.keys(ongoingStatusCounts);
+  const chartData = totalOngoing === 0 ? [1] : Object.values(ongoingStatusCounts);
+  const chartColors = totalOngoing === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A'];
+
+  if(ongoingStatusChart) ongoingStatusChart.destroy();
+  ongoingStatusChart = new Chart(document.getElementById('ongoingStatusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: chartLabels,
+      datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 0, borderRadius: 4 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10, padding: 10 } } }
+    }
+  });
+
+  persistAppState();
+}
+
+function openPlanTaskModal(planId) {
+  const plan = plans.find(p => p.id === planId);
+  if(!plan) return;
+  taskModalPlanId = planId;
+  document.getElementById('planTaskModalTitle').textContent = `Add task to ${plan.outgoing} → ${plan.incoming}`;
+  document.getElementById('pt-name').value = '';
+  document.getElementById('pt-phase').value = phases[0];
+  document.getElementById('pt-owner').value = 'Incoming SA';
+  document.getElementById('pt-priority').value = 'Medium';
+  document.getElementById('pt-day').value = 1;
+  document.getElementById('pt-notes').value = '';
+  document.getElementById('planTaskModalOverlay').style.display = 'flex';
+}
+
+function closePlanTaskModal() {
+  taskModalPlanId = null;
+  document.getElementById('planTaskModalOverlay').style.display = 'none';
+}
+
+function savePlanTask() {
+  if(!taskModalPlanId) return;
+  const name = document.getElementById('pt-name').value.trim();
+  if(!name) {
+    alert('Task name is required');
+    return;
+  }
+
+  if(!planTaskStore[taskModalPlanId]) planTaskStore[taskModalPlanId] = [];
+  planTaskStore[taskModalPlanId].push({
+    id: nextId++,
+    name,
+    phase: document.getElementById('pt-phase').value,
+    owner: document.getElementById('pt-owner').value,
+    priority: document.getElementById('pt-priority').value,
+    day: Math.max(1, parseInt(document.getElementById('pt-day').value, 10) || 1),
+    status: 'To-do',
+    progress: 0,
+    notes: document.getElementById('pt-notes').value.trim()
+  });
+
+  closePlanTaskModal();
+  renderPlansPanel();
+}
+
+function deletePlan(planId) {
+  const plan = plans.find(p => p.id === planId);
+  if(!plan) return;
+
+  const ok = confirm(`Delete plan for ${plan.outgoing} -> ${plan.incoming}?`);
+  if(!ok) return;
+
+  plans = plans.filter(p => p.id !== planId);
+  delete planTaskStore[planId];
+
+  if(currentPlanId === planId) {
+    currentPlanId = null;
+    isPlanSelected = false;
+    updateTrackerVisibility();
+    switchTab('plans');
+  }
+
+  renderPlansPanel();
+}
+
+function updateTrackerVisibility() {
+  const metaRow = document.getElementById('trackerMetaRow');
+  const backBtn = document.getElementById('backToPlansBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const demoBtn = document.getElementById('demoBtn');
+  const exportBtn = document.getElementById('exportPlanBtn');
+  const headerDemoLabel = document.getElementById('headerDemoLabel');
+  const plansTab = document.querySelector('.tab[data-tab="plans"]');
+  const trackerTabs = Array.from(document.querySelectorAll('.tab[data-tab="tasks"], .tab[data-tab="daily"], .tab[data-tab="progress"]'));
+
+  if(headerDemoLabel) {
+    if(isDemoMode) headerDemoLabel.classList.remove('hidden');
+    else headerDemoLabel.classList.add('hidden');
+  }
+
+  if(homeBtn) {
+    if(isDemoPopupMode) {
+      if(isPlanSelected) homeBtn.classList.add('hidden');
+      else homeBtn.classList.remove('hidden');
+    } else if(isDemoMode) {
+      homeBtn.classList.remove('hidden');
+    } else {
+      homeBtn.classList.add('hidden');
+    }
+
+    homeBtn.textContent = isDemoPopupMode ? 'Home' : 'Home';
+  }
+
+  if(demoBtn) {
+    // Keep demo launcher visible on home/plans, hide it once a plan is opened.
+    if(isPlanSelected || isDemoPopupMode) demoBtn.classList.add('hidden');
+    else demoBtn.classList.remove('hidden');
+  }
+
+  if(exportBtn) {
+    if(isPlanSelected) exportBtn.classList.remove('hidden');
+    else exportBtn.classList.add('hidden');
+  }
+
+  if(backBtn) {
+    backBtn.textContent = isDemoMode ? 'Back to Demo' : 'Back to Plans';
+  }
+
+  if(isPlanSelected) {
+    metaRow.classList.remove('hidden');
+    backBtn.classList.remove('hidden');
+    plansTab.classList.add('hidden');
+    trackerTabs.forEach(tab => tab.classList.remove('hidden'));
+  } else {
+    metaRow.classList.add('hidden');
+    backBtn.classList.add('hidden');
+    plansTab.classList.remove('hidden');
+    trackerTabs.forEach(tab => tab.classList.add('hidden'));
+  }
+}
+
+function backToPlans() {
+  persistCurrentPlanTasks();
+  isPlanSelected = false;
+  updateTrackerVisibility();
+  switchTab('plans');
+  renderPlansPanel();
+}
+
+function createDefaultTasksForPlan() {
+  return taskTemplate.map(t => ({ ...t, id: nextId++ }));
+}
+
+function persistCurrentPlanTasks() {
+  if(!currentPlanId) return;
+
+  syncCurrentPlanStatusFromTasks();
+
+  planTaskStore[currentPlanId] = tasks.map(t => ({ ...t }));
+  const currentPlan = plans.find(p => p.id === currentPlanId);
+  if(currentPlan) {
+    const avg = tasks.length ? Math.round(tasks.reduce((sum, t) => sum + t.progress, 0) / tasks.length) : 0;
+    currentPlan.progress = avg;
+    currentPlan.status = document.getElementById('m-status').value;
+    currentPlan.project = document.getElementById('m-project').value;
+    currentPlan.outgoing = document.getElementById('m-outgoing').value;
+    currentPlan.incoming = document.getElementById('m-incoming').value;
+    currentPlan.start = document.getElementById('m-start').value;
+    currentPlan.end = document.getElementById('m-end').value;
+  }
+}
+
+function derivePlanStatusFromTasks() {
+  const total = tasks.length;
+  if(total === 0) return 'Planning';
+
+  const doneCount = tasks.filter(t => t.status === 'Done').length;
+  const todoCount = tasks.filter(t => t.status === 'To-do').length;
+
+  if(doneCount === total) return 'Completed';
+  if(todoCount === total) return 'Planning';
+  return 'In Progress';
+}
+
+function syncCurrentPlanStatusFromTasks() {
+  if(!currentPlanId) return;
+
+  const derivedStatus = derivePlanStatusFromTasks();
+  const statusEl = document.getElementById('m-status');
+  if(statusEl) statusEl.value = derivedStatus;
+
+  const currentPlan = plans.find(p => p.id === currentPlanId);
+  if(currentPlan) currentPlan.status = derivedStatus;
+}
+
+function openPlan(planId) {
+  persistCurrentPlanTasks();
+  const plan = plans.find(p => p.id === planId);
+  if(!plan) return;
+
+  currentPlanId = planId;
+  if(!planTaskStore[planId]) planTaskStore[planId] = createDefaultTasksForPlan();
+  tasks = planTaskStore[planId].map(t => ({ ...t }));
+
+  document.getElementById('m-outgoing').value = plan.outgoing;
+  document.getElementById('m-incoming').value = plan.incoming;
+  document.getElementById('m-project').value = plan.project;
+  document.getElementById('m-start').value = plan.start;
+  document.getElementById('m-end').value = plan.end;
+  document.getElementById('m-status').value = plan.status;
+
+  isPlanSelected = true;
+  updateTrackerVisibility();
+  selectedDay = null;
+  switchTab('progress');
+  renderAll();
+}
+
+function createPlanFromForm() {
+  const outgoing = document.getElementById('p-outgoing').value.trim();
+  const incoming = document.getElementById('p-incoming').value.trim();
+  const project = document.getElementById('p-project').value.trim();
+  const start = document.getElementById('p-start').value;
+  const end = document.getElementById('p-end').value;
+  const status = document.getElementById('p-status').value;
+
+  if(!outgoing || !incoming || !project || !start || !end) {
+    alert('Please complete all plan setup fields.');
+    return;
+  }
+  if(toDate(end) < toDate(start)) {
+    alert('End date must be on or after start date.');
+    return;
+  }
+
+  const normalizeName = (v) => v.toLowerCase().replace(/\s+/g, ' ').trim();
+  const outgoingKey = normalizeName(outgoing);
+  const incomingKey = normalizeName(incoming);
+  const duplicatePlan = plans.some(p => normalizeName(p.outgoing) === outgoingKey && normalizeName(p.incoming) === incomingKey);
+  if(duplicatePlan) {
+    alert('A plan already exists for this Outgoing SA and Incoming SA combination.');
+    return;
+  }
+
+  const newPlan = { id: nextPlanId++, outgoing, incoming, project, start, end, status, progress: status === 'Completed' ? 100 : 0 };
+  plans.unshift(newPlan);
+  planTaskStore[newPlan.id] = createDefaultTasksForPlan();
+  renderPlansPanel();
+}
+
+function renderTasks() {
+  const tbody = document.getElementById('taskBody');
+  tbody.innerHTML = tasks.map((t,i) => `
+    <tr>
+      <td style="color:var(--color-text-tertiary);font-size:12px;">${i+1}</td>
+      <td>
+        <div style="font-weight:500;font-size:13px;">${t.name}</div>
+        ${t.notes ? `<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px;">${t.notes}</div>` : ''}
+      </td>
+      <td>
+        <select class="select-cell" onchange="updateTaskField(${t.id},'phase',this.value)">
+          ${phases.map(p=>`<option${p===t.phase?' selected':''}>${p}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="select-cell" onchange="updateTaskField(${t.id},'owner',this.value)">
+          ${owners.map(o=>`<option${o===t.owner?' selected':''}>${o}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="select-cell" onchange="updateTaskField(${t.id},'priority',this.value)">
+          ${priorities.map(p=>`<option${p===t.priority?' selected':''}>${p}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="select-cell" onchange="updateTaskField(${t.id},'day',parseInt(this.value,10))">
+          ${Array.from({length: 30}, (_, idx) => idx + 1).map(d=>`<option value="${d}"${d===t.day?' selected':''}>Day ${d}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="select-cell" onchange="updateTaskField(${t.id},'status',this.value)">
+          ${statuses.map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${t.progress}%;"></div></div>
+          <span style="font-size:11px;color:var(--color-text-tertiary);min-width:26px;">${t.progress}%</span>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-sm" onclick="openEdit(${t.id})" style="margin-right:4px;">Edit</button>
+        <button class="btn btn-sm" onclick="deleteTask(${t.id})" style="color:#a32d2d;">Del</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function changeStatus(id, val) {
+  updateTaskField(id, 'status', val);
+}
+
+function updateTaskField(id, field, value) {
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+
+  t[field] = value;
+
+  if(field === 'status') {
+    const statusProgressMap = {
+      'To-do': 0,
+      'In progress': 50,
+      'Done': 100,
+      'Blocked': 0
+    };
+    t.progress = statusProgressMap[value] ?? t.progress;
+  }
+
+  renderAll();
+}
+
+function renderDaily() {
+  const grid = document.getElementById('dayGrid');
+  const maxDay = Math.max(...tasks.map(t=>t.day), 1);
+  const days = Array.from({length: maxDay}, (_, i) => i + 1);
+  const today = getTodayDay(maxDay);
+  if(!selectedDay || !days.includes(selectedDay)) selectedDay = today;
+
+  const daySelect = document.getElementById('dailyDaySelect');
+  if(daySelect) {
+    daySelect.innerHTML = days.map(d => `<option value="${d}"${d===selectedDay?' selected':''}>Day ${d}</option>`).join('');
+  }
+
+  const picker = document.getElementById('dailyDatePicker');
+  if(picker) picker.value = getDateForDay(selectedDay);
+
+  const dt = tasks.filter(t=>t.day===selectedDay);
+  const phaseLabel = dt[0] ? dt[0].phase : 'No phase assigned';
+  const isToday = selectedDay === today;
+  grid.innerHTML = `
+    <div class="day-selector">
+      ${days.map(d => `<button class="day-chip${d===selectedDay?' selected':''}" onclick="setSelectedDay(${d})">D${d}</button>`).join('')}
+    </div>
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-num${isToday?' today':''}">D${selectedDay}</div>
+        <div>
+          <div class="day-title">${isToday?'Today — ':''}Day ${selectedDay} details</div>
+          <div class="day-phase">${phaseLabel}</div>
+        </div>
+      </div>
+      <div class="day-tasks">
+        ${dt.length ? dt.map(t=>`
+          <div class="day-task-item">
+            <input type="checkbox" ${t.status==='Done'?'checked':''} onchange="toggleDone(${t.id},this.checked)" />
+            <span class="day-task-label${t.status==='Done'?' done':''}">${t.name}</span>
+            <span class="owner-tag">${t.owner}</span>
+            ${prioBadge(t.priority)}
+          </div>
+        `).join('') : `<div style="font-size:12px;color:var(--color-text-secondary);padding:4px 0;">No tasks scheduled for this day.</div>`}
+      </div>
+      <textarea class="notes-input" rows="2" placeholder="Add daily notes for day ${selectedDay}..."></textarea>
+    </div>
+  `;
+}
+
+function getDateForDay(day) {
+  const startInput = document.getElementById('m-start');
+  const startVal = (startInput && startInput.value) ? startInput.value : '2026-04-07';
+  const [y, m, d] = startVal.split('-').map(Number);
+  const startDate = new Date(y, m - 1, d);
+  startDate.setDate(startDate.getDate() + Math.max(0, day - 1));
+  const yy = startDate.getFullYear();
+  const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+  const dd = String(startDate.getDate()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}`;
+}
+
+function getTodayDay(maxDay) {
+  const startInput = document.getElementById('m-start');
+  const startVal = (startInput && startInput.value) ? startInput.value : '2026-04-07';
+  const [sy, sm, sd] = startVal.split('-').map(Number);
+  const startDate = new Date(sy, sm - 1, sd);
+
+  const now = new Date();
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.floor((todayDate - startDate) / 86400000) + 1;
+
+  return Math.min(maxDay, Math.max(1, diffDays));
+}
+
+function onDailyDateChange(value) {
+  if(!value) return;
+  const startVal = document.getElementById('m-start').value;
+  if(!startVal) return;
+
+  const [sy, sm, sd] = startVal.split('-').map(Number);
+  const [vy, vm, vd] = value.split('-').map(Number);
+  const startDate = new Date(sy, sm - 1, sd);
+  const selectedDate = new Date(vy, vm - 1, vd);
+  const diffDays = Math.floor((selectedDate - startDate) / 86400000) + 1;
+  const maxDay = Math.max(...tasks.map(t=>t.day), 1);
+  const boundedDay = Math.min(maxDay, Math.max(1, diffDays));
+  setSelectedDay(boundedDay);
+}
+
+function setSelectedDay(day) {
+  selectedDay = day;
+  renderDaily();
+}
+
+function toggleDone(id, checked) {
+  const t = tasks.find(x=>x.id===id);
+  if(t) { t.status = checked?'Done':'To-do'; t.progress = checked?100:0; renderAll(); }
+}
+
+function renderSummary() {
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.status==='Done').length;
+  const inprog = tasks.filter(t=>t.status==='In progress').length;
+  const blocked = tasks.filter(t=>t.status==='Blocked').length;
+  document.getElementById('summaryRow').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total tasks</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#1D9E75;">${done}</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#185FA5;">${inprog}</div><div class="stat-label">In progress</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#A32D2D;">${blocked}</div><div class="stat-label">Blocked</div></div>
+  `;
+}
+
+function renderCharts() {
+  const statusCounts = {'Done':0,'In progress':0,'To-do':0,'Blocked':0};
+  tasks.forEach(t => statusCounts[t.status] = (statusCounts[t.status]||0)+1);
+
+  const phaseCounts = {};
+  phases.forEach(p => { phaseCounts[p] = tasks.filter(t=>t.phase===p).length; });
+
+  if(statusChart) statusChart.destroy();
+  statusChart = new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(statusCounts),
+      datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#639922','#378ADD','#888780','#E24B4A'], borderWidth: 0, borderRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10, padding: 10 } } } }
+  });
+
+  if(phaseChart) phaseChart.destroy();
+  phaseChart = new Chart(document.getElementById('phaseChart'), {
+    type: 'bar',
+    data: {
+      labels: phases.map(p => p.split(' — ')[0]),
+      datasets: [{ data: phases.map(p => phaseCounts[p]||0), backgroundColor: '#B5D4F4', borderRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } }, x: { ticks: { font: { size: 11 } } } } }
+  });
+
+  const maxDay = Math.max(...tasks.map(t=>t.day));
+  const burnLabels = Array.from({length: maxDay}, (_,i) => `D${i+1}`);
+  const totalByDay = burnLabels.map((_,i) => tasks.filter(t=>t.day<=i+1).length);
+  const doneByDay = burnLabels.map((_,i) => tasks.filter(t=>t.day<=i+1&&t.status==='Done').length);
+
+  if(burnChart) burnChart.destroy();
+  burnChart = new Chart(document.getElementById('burnChart'), {
+    type: 'line',
+    data: {
+      labels: burnLabels,
+      datasets: [
+        { label: 'Total tasks', data: totalByDay, borderColor: '#B5D4F4', backgroundColor: 'rgba(55,138,221,0.08)', fill: true, tension: 0.4, pointRadius: 2 },
+        { label: 'Completed', data: doneByDay, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.1)', fill: true, tension: 0.4, pointRadius: 2 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } }, x: { ticks: { font: { size: 10 }, maxTicksLimit: 15 } } } }
+  });
+
+  const phaseProgress = phases.map(p => {
+    const pt = tasks.filter(t=>t.phase===p);
+    if(!pt.length) return 0;
+    return Math.round(pt.reduce((s,t)=>s+t.progress,0)/pt.length);
+  });
+
+  if(barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: phases.map(p => p.split(' — ')[0]),
+      datasets: [{ label: '% complete', data: phaseProgress, backgroundColor: ['#1D9E75','#378ADD','#EF9F27','#D85A30','#7F77DD'], borderRadius: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 100, ticks: { callback: v => v+'%', font: { size: 11 } } }, y: { ticks: { font: { size: 11 } } } } }
+  });
+}
+
+function renderAll() {
+  persistCurrentPlanTasks();
+  renderTasks();
+  renderDaily();
+  renderSummary();
+  renderPlansPanel();
+  if(document.getElementById('tab-progress').classList.contains('active')) renderCharts();
+  persistAppState();
+}
+
+function switchTab(id, el) {
+  if(!isPlanSelected && id !== 'plans') return;
+  const tabEl = el || document.querySelector(`.tab[data-tab="${id}"]`);
+  if(!tabEl) return;
+
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id === 'progress') setTimeout(renderCharts, 50);
+  if(id === 'plans') setTimeout(renderPlansPanel, 50);
+  persistAppState();
+}
+
+function openAddModal() {
+  editId = null;
+  document.getElementById('modalTitle').textContent = 'Add task';
+  ['f-name','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-phase').value = 'Week 1 — Orientation';
+  document.getElementById('f-owner').value = 'Incoming SA';
+  document.getElementById('f-priority').value = 'Medium';
+  document.getElementById('f-status').value = 'To-do';
+  document.getElementById('f-progress').value = 0;
+  document.getElementById('f-day').value = '';
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function openEdit(id) {
+  editId = id;
+  const t = tasks.find(x=>x.id===id);
+  document.getElementById('modalTitle').textContent = 'Edit task';
+  document.getElementById('f-name').value = t.name;
+  document.getElementById('f-phase').value = t.phase;
+  document.getElementById('f-owner').value = t.owner;
+  document.getElementById('f-priority').value = t.priority;
+  document.getElementById('f-day').value = t.day;
+  document.getElementById('f-status').value = t.status;
+  document.getElementById('f-progress').value = t.progress;
+  document.getElementById('f-notes').value = t.notes;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+function saveTask() {
+  const name = document.getElementById('f-name').value.trim();
+  if(!name) { alert('Task name is required'); return; }
+  const obj = {
+    name,
+    phase: document.getElementById('f-phase').value,
+    owner: document.getElementById('f-owner').value,
+    priority: document.getElementById('f-priority').value,
+    day: parseInt(document.getElementById('f-day').value) || 1,
+    status: document.getElementById('f-status').value,
+    progress: Math.min(100, Math.max(0, parseInt(document.getElementById('f-progress').value) || 0)),
+    notes: document.getElementById('f-notes').value.trim()
+  };
+  if(editId) { const t = tasks.find(x=>x.id===editId); Object.assign(t, obj); }
+  else { tasks.push({ id: nextId++, ...obj }); }
+  closeModal();
+  renderAll();
+}
+
+function deleteTask(id) {
+  if(confirm('Delete this task?')) { tasks = tasks.filter(x=>x.id!==id); renderAll(); }
+}
+
+if(!loadPersistedState()) {
+  renderAll();
+  updateTrackerVisibility();
+}
+
+if(isDemoPopupMode) {
+  loadDemoData();
+}
+
+document.getElementById('m-start').addEventListener('change', () => renderDaily());
+</script>
+</body>
+</html>

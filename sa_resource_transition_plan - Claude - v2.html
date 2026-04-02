@@ -767,9 +767,8 @@ function renderPlansPanel() {
     </tr>
   `).join('') : `<tr><td colspan="7" style="color:var(--color-text-secondary);">No ongoing plans.</td></tr>`;
 
-  const chartPlans = plans.filter(p => toDate(p.start) <= today);
-  const ongoingStatusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0, 'Completed': 0 };
-  chartPlans.forEach(p => {
+  const ongoingStatusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0 };
+  ongoing.forEach(p => {
     const status = classifyPlanStatus(p);
     if(ongoingStatusCounts[status] !== undefined) ongoingStatusCounts[status] += 1;
   });
@@ -777,7 +776,7 @@ function renderPlansPanel() {
   const totalOngoing = Object.values(ongoingStatusCounts).reduce((sum, value) => sum + value, 0);
   const chartLabels = totalOngoing === 0 ? ['No ongoing plans'] : Object.keys(ongoingStatusCounts);
   const chartData = totalOngoing === 0 ? [1] : Object.values(ongoingStatusCounts);
-  const chartColors = totalOngoing === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A', '#639922'];
+  const chartColors = totalOngoing === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A'];
 
   if(ongoingStatusChart) ongoingStatusChart.destroy();
   ongoingStatusChart = new Chart(document.getElementById('ongoingStatusChart'), {
@@ -1353,21 +1352,6 @@ if(isDemoPopupMode) {
 }
 
 document.getElementById('m-start').addEventListener('change', () => renderDaily());
-document.getElementById('m-status').addEventListener('change', () => {
-  persistCurrentPlanTasks();
-  renderPlansPanel();
-  persistAppState();
-});
-document.getElementById('m-start').addEventListener('change', () => {
-  persistCurrentPlanTasks();
-  renderPlansPanel();
-  persistAppState();
-});
-document.getElementById('m-end').addEventListener('change', () => {
-  persistCurrentPlanTasks();
-  renderPlansPanel();
-  persistAppState();
-});
 </script>
 </body>
 </html>

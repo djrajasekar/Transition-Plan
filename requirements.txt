@@ -1,5 +1,0 @@
-# SA Resource Transition Plan requirements
-# This is a static HTML/CSS/JavaScript application.
-# No external Python or Node package dependencies are required.
-
-None

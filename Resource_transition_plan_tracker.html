@@ -14,12 +14,17 @@
     --color-background-primary: #fffdfb;
     --color-background-secondary: #f8f2ec;
     --color-background-tertiary: #efe5dc;
+    --color-background-accent: #fff4e7;
     --color-text-primary: #342722;
     --color-text-secondary: #5f5048;
     --color-text-tertiary: #86766d;
     --color-border-tertiary: rgba(76,56,42,0.12);
     --color-border-secondary: rgba(76,56,42,0.22);
     --color-border-primary: rgba(76,56,42,0.35);
+    --color-accent-primary: #d85a30;
+    --color-accent-secondary: #1d9e75;
+    --color-accent-tertiary: #378add;
+    --color-accent-soft: rgba(216,90,48,0.12);
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
@@ -29,24 +34,32 @@
       --color-background-primary: #221d1b;
       --color-background-secondary: #2d2623;
       --color-background-tertiary: #191514;
+      --color-background-accent: #352620;
       --color-text-primary: #f7efe9;
       --color-text-secondary: #d4c3b8;
       --color-text-tertiary: #aa978c;
       --color-border-tertiary: rgba(255,245,238,0.10);
       --color-border-secondary: rgba(255,245,238,0.18);
       --color-border-primary: rgba(255,245,238,0.28);
+      --color-accent-primary: #ef8d56;
+      --color-accent-secondary: #47b98f;
+      --color-accent-tertiary: #68b2f1;
+      --color-accent-soft: rgba(239,141,86,0.18);
     }
   }
   body {
     font-family: var(--font-sans);
-    background: linear-gradient(180deg, #f8f3ee 0%, var(--color-background-tertiary) 100%);
+    background:
+      radial-gradient(circle at top left, rgba(250,199,117,0.26), transparent 28%),
+      radial-gradient(circle at top right, rgba(55,138,221,0.16), transparent 30%),
+      linear-gradient(180deg, #fdf7f0 0%, var(--color-background-tertiary) 100%);
     color: var(--color-text-primary);
     min-height: 100vh;
     padding: 2rem 1rem;
   }
   .container { max-width: 1100px; margin: 0 auto; }
   .app { padding: 0; }
-  .header { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; overflow: hidden; min-height: 76px; }
+  .header { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; overflow: hidden; min-height: 76px; background: linear-gradient(135deg, rgba(255,244,231,0.92), rgba(255,255,255,0.72)); border: 1px solid rgba(216,90,48,0.12); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; box-shadow: 0 10px 30px rgba(52,39,34,0.08); }
   .header-copy { flex: 1; position: relative; z-index: 1; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
   .header h1 { font-size: 22px; font-weight: 600; color: var(--color-text-primary); }
@@ -69,31 +82,31 @@
   }
   .meta-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
   .hidden { display: none !important; }
-  .meta-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .meta-card { background: linear-gradient(180deg, var(--color-background-accent), var(--color-background-secondary)); border: 1px solid rgba(216,90,48,0.10); border-radius: var(--border-radius-md); padding: 12px 14px; box-shadow: 0 6px 18px rgba(52,39,34,0.05); }
   .meta-card label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
   .meta-card span { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
   .meta-card input, .meta-card select { font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; width: 100%; font-family: var(--font-sans); }
-  .tabs { display: flex; gap: 4px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
-  .tab { padding: 8px 14px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-sans); }
-  .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
-  .tab:hover:not(.active) { color: var(--color-text-primary); }
+  .tabs { display: flex; gap: 6px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+  .tab { padding: 8px 14px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border: 1px solid transparent; border-bottom: 2px solid transparent; margin-bottom: -0.5px; background: rgba(255,255,255,0.35); border-top-left-radius: 10px; border-top-right-radius: 10px; border-left: 1px solid transparent; border-right: 1px solid transparent; font-family: var(--font-sans); transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+  .tab.active { color: var(--color-accent-primary); border-color: rgba(216,90,48,0.16); border-bottom-color: var(--color-accent-primary); font-weight: 600; background: linear-gradient(180deg, rgba(216,90,48,0.14), rgba(255,255,255,0.88)); }
+  .tab:hover:not(.active) { color: var(--color-text-primary); background: rgba(250,199,117,0.12); }
   .panel { display: none; }
   .panel.active { display: block; }
   .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .section-head h2 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
-  .btn { padding: 7px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); }
-  .btn:hover { background: var(--color-background-secondary); }
-  .btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
-  .btn-primary:hover { opacity: 0.85; }
+  .btn { padding: 7px 14px; font-size: 13px; border: 1px solid rgba(55,138,221,0.18); border-radius: var(--border-radius-md); background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,244,231,0.92)); color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); box-shadow: 0 4px 14px rgba(52,39,34,0.06); transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease; }
+  .btn:hover { background: linear-gradient(180deg, rgba(250,199,117,0.18), rgba(255,244,231,0.95)); box-shadow: 0 8px 20px rgba(52,39,34,0.10); transform: translateY(-1px); }
+  .btn-primary { background: linear-gradient(135deg, var(--color-accent-primary), #f08b52); color: #fffaf6; border-color: transparent; }
+  .btn-primary:hover { background: linear-gradient(135deg, #c84f29, #e47841); opacity: 1; }
   .btn-sm { padding: 4px 10px; font-size: 12px; }
-  .table-wrap { overflow-x: auto; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); }
+  .table-wrap { overflow-x: auto; background: rgba(255,255,255,0.92); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); box-shadow: 0 10px 24px rgba(52,39,34,0.06); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 10px 12px; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; background: var(--color-background-secondary); }
+  th { text-align: left; padding: 10px 12px; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; background: linear-gradient(180deg, rgba(250,199,117,0.18), rgba(248,242,236,0.95)); }
   th:first-child { border-radius: var(--border-radius-lg) 0 0 0; }
   th:last-child { border-radius: 0 var(--border-radius-lg) 0 0; }
   td { padding: 9px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--color-background-secondary); }
+  tr:hover td { background: rgba(255,244,231,0.72); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .badge-todo { background: #D3D1C7; color: #444441; }
   .badge-in-progress { background: #B5D4F4; color: #0C447C; }
@@ -113,7 +126,7 @@
   .day-chip { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); padding: 8px 6px; font-size: 12px; cursor: pointer; text-align: center; }
   .day-chip:hover { background: var(--color-background-secondary); }
   .day-chip.selected { border-color: #1D9E75; background: rgba(29,158,117,0.12); color: #0f6a4f; font-weight: 500; }
-  .day-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .day-card { background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,244,231,0.84)); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; box-shadow: 0 10px 24px rgba(52,39,34,0.06); }
   .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
   .day-num { width: 32px; height: 32px; border-radius: 50%; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--color-text-primary); flex-shrink: 0; }
   .day-num.today { background: #1D9E75; color: #fff; }
@@ -127,7 +140,7 @@
   .notes-input { width: 100%; margin-top: 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 12px; color: var(--color-text-primary); background: var(--color-background-secondary); font-family: var(--font-sans); resize: none; outline: none; }
   .notes-input:focus { border-color: var(--color-border-primary); }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .modal { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 85vh; overflow-y: auto; }
+  .modal { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,244,231,0.92)); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 16px 40px rgba(0,0,0,0.18); }
   .modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
@@ -135,10 +148,10 @@
   .form-group textarea { resize: vertical; min-height: 70px; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
   .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-  .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; text-align: center; }
+  .stat-card { background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(181,212,244,0.18)); border: 1px solid rgba(55,138,221,0.10); border-radius: var(--border-radius-md); padding: 14px; text-align: center; box-shadow: 0 8px 18px rgba(52,39,34,0.05); }
   .stat-num { font-size: 24px; font-weight: 500; color: var(--color-text-primary); }
   .stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
-  .chart-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .chart-wrap { background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,250,245,0.92)); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; box-shadow: 0 10px 26px rgba(52,39,34,0.06); }
   .chart-title { font-size: 14px; font-weight: 500; margin-bottom: 1rem; color: var(--color-text-primary); }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   @media (max-width: 580px) { .two-col { grid-template-columns: 1fr; } .summary-row { grid-template-columns: repeat(2,1fr); } }
@@ -148,10 +161,10 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
   .plans-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1rem; margin-bottom: 1rem; align-items: start; }
   .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; align-items: start; }
-  .table-caption { font-size: 13px; color: var(--color-text-secondary); margin: 0.25rem 0 0.5rem; }
+  .table-caption { font-size: 13px; color: var(--color-accent-primary); margin: 0.25rem 0 0.5rem; font-weight: 600; }
   .mini-table th, .mini-table td { font-size: 12px; padding: 8px 10px; }
   .week-plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-  .week-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; }
+  .week-card { background: linear-gradient(180deg, rgba(255,244,231,0.92), rgba(255,255,255,0.92)); border: 0.5px solid rgba(216,90,48,0.12); border-radius: var(--border-radius-md); padding: 12px; box-shadow: 0 8px 20px rgba(52,39,34,0.05); }
   .week-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
   .week-chip { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: rgba(29,158,117,0.12); color: #0f6a4f; }
   .week-range { font-size: 11px; color: var(--color-text-secondary); text-align: right; }
@@ -211,12 +224,13 @@
     <div class="section-head">
       <h2>Plan setup and portfolio</h2>
       <div style="display:flex;gap:8px;">
-        <button id="cancelPlanEditBtn" class="btn hidden" onclick="resetPlanForm()">Cancel edit</button>
-        <button id="createPlanBtn" class="btn btn-primary" onclick="createPlanFromForm()">Create plan</button>
+        <button id="openPlanFormBtn" class="btn btn-primary" onclick="showPlanForm()">Create plan</button>
+        <button id="cancelPlanEditBtn" class="btn hidden" onclick="resetPlanForm()">Cancel</button>
+        <button id="createPlanBtn" class="btn btn-primary hidden" onclick="createPlanFromForm()">Create plan</button>
       </div>
     </div>
 
-    <div class="setup-grid">
+    <div id="planSetupSection" class="setup-grid hidden">
       <div class="chart-wrap">
         <div id="planFormTitle" class="chart-title">Create transition plan</div>
         <div class="two-col" style="grid-template-columns:1fr 1fr;gap:10px;">
@@ -368,11 +382,6 @@
   <!-- Progress charts and summaries -->
   <!-- ***************************** -->
   <div class="panel" id="tab-progress">
-    <div class="chart-wrap">
-      <div class="chart-title">Weekly transition outline</div>
-      <div class="helper-text">These week descriptions stay editable after the plan is created.</div>
-      <div class="week-plan-grid" id="weekPlanGrid"></div>
-    </div>
     <div class="summary-row" id="summaryRow"></div>
     <div class="two-col">
       <div class="chart-wrap">
@@ -395,6 +404,11 @@
     <div class="chart-wrap">
       <div class="chart-title">Progress by phase</div>
       <div style="position:relative;width:100%;height:240px;"><canvas id="barChart"></canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Weekly transition outline</div>
+      <div class="helper-text">These week descriptions stay editable after the plan is created.</div>
+      <div class="week-plan-grid" id="weekPlanGrid"></div>
     </div>
   </div>
 </div>
@@ -517,6 +531,7 @@ let isPlanSelected = false;
 let taskModalPlanId = null;
 let isDemoMode = false;
 let editingPlanId = null;
+let isPlanFormVisible = false;
 const isDemoPopupMode = new URLSearchParams(window.location.search).get('demo') === '1';
 
 const phases = [
@@ -778,14 +793,36 @@ function populateTaskDayInput(inputId, planId, selectedValue = 1) {
 
 function setPlanFormMode(planId = null) {
   editingPlanId = planId;
+  const openBtn = document.getElementById('openPlanFormBtn');
   const createBtn = document.getElementById('createPlanBtn');
   const cancelBtn = document.getElementById('cancelPlanEditBtn');
   const formTitle = document.getElementById('planFormTitle');
   const isEditing = planId !== null;
 
-  if(createBtn) createBtn.textContent = isEditing ? 'Update plan' : 'Create plan';
-  if(cancelBtn) cancelBtn.classList.toggle('hidden', !isEditing);
+  if(openBtn) openBtn.classList.toggle('hidden', isPlanFormVisible);
+  if(createBtn) {
+    createBtn.textContent = isEditing ? 'Update plan' : 'Create plan';
+    createBtn.classList.toggle('hidden', !isPlanFormVisible);
+  }
+  if(cancelBtn) {
+    cancelBtn.textContent = isEditing ? 'Cancel edit' : 'Cancel';
+    cancelBtn.classList.toggle('hidden', !isPlanFormVisible);
+  }
   if(formTitle) formTitle.textContent = isEditing ? 'Edit transition plan' : 'Create transition plan';
+}
+
+function setPlanFormVisibility(isVisible) {
+  isPlanFormVisible = Boolean(isVisible);
+  const section = document.getElementById('planSetupSection');
+  if(section) section.classList.toggle('hidden', !isPlanFormVisible);
+  setPlanFormMode(editingPlanId);
+}
+
+function showPlanForm() {
+  if(editingPlanId === null) {
+    renderPlanSetupWeeks();
+  }
+  setPlanFormVisibility(true);
 }
 
 function resetPlanForm() {
@@ -798,6 +835,7 @@ function resetPlanForm() {
   document.getElementById('p-status').value = 'Planning';
   renderPlanSetupWeeks();
   setPlanFormMode(null);
+  setPlanFormVisibility(false);
 }
 
 function editPlan(planId) {
@@ -812,6 +850,7 @@ function editPlan(planId) {
   document.getElementById('p-weeks').value = String(getWeekCountFromPlan(plan));
   document.getElementById('p-status').value = plan.status || 'Planning';
   renderPlanSetupWeeks(ensureWeeklyPlan(plan));
+  setPlanFormVisibility(true);
   setPlanFormMode(planId);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1413,6 +1452,9 @@ function updateTrackerVisibility() {
 function backToPlans() {
   persistCurrentPlanTasks();
   isPlanSelected = false;
+  currentPlanId = null;
+  tasks = [];
+  selectedDay = null;
   updateTrackerVisibility();
   switchTab('plans');
   renderPlansPanel();
@@ -1423,7 +1465,7 @@ function createDefaultTasksForPlan() {
 }
 
 function persistCurrentPlanTasks() {
-  if(!currentPlanId) return;
+  if(!currentPlanId || !isPlanSelected) return;
 
   syncCurrentPlanStatusFromTasks();
 

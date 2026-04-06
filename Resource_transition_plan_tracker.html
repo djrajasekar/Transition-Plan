@@ -107,6 +107,23 @@
   td { padding: 9px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(255,244,231,0.72); }
+  #taskTable { table-layout: fixed; }
+  #taskTable th, #taskTable td { white-space: normal; }
+  #taskTable th:nth-child(1), #taskTable td:nth-child(1) { width: 4%; }
+  #taskTable th:nth-child(2), #taskTable td:nth-child(2) { width: 22%; }
+  #taskTable th:nth-child(3), #taskTable td:nth-child(3) { width: 17%; }
+  #taskTable th:nth-child(4), #taskTable td:nth-child(4) { width: 10%; }
+  #taskTable th:nth-child(5), #taskTable td:nth-child(5) { width: 8%; }
+  #taskTable th:nth-child(6), #taskTable td:nth-child(6) { width: 12%; }
+  #taskTable th:nth-child(7), #taskTable td:nth-child(7) { width: 10%; }
+  #taskTable th:nth-child(8), #taskTable td:nth-child(8) { width: 9%; }
+  #taskTable th:nth-child(9), #taskTable td:nth-child(9) { width: 8%; }
+  .task-phase-select, .task-priority-select, .task-status-select { min-width: 0; }
+  .task-sortable { cursor: pointer; user-select: none; }
+  .task-sortable:hover { color: var(--color-text-primary); }
+  .task-sort-label { display: inline-flex; align-items: center; gap: 6px; }
+  .task-sort-indicator { font-size: 10px; color: var(--color-text-tertiary); line-height: 1; }
+  .task-sortable.active .task-sort-indicator { color: var(--color-accent-primary); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .badge-todo { background: #D3D1C7; color: #444441; }
   .badge-in-progress { background: #B5D4F4; color: #0C447C; }
@@ -346,14 +363,14 @@
       <table id="taskTable">
         <thead>
           <tr>
-            <th style="width:32px;">#</th>
-            <th>Task</th>
-            <th>Phase</th>
-            <th>Owner</th>
-            <th>Priority</th>
-            <th>Due day</th>
-            <th>Status</th>
-            <th>Progress</th>
+            <th class="task-sortable" style="width:32px;" onclick="setTaskSort('index')"><span class="task-sort-label">#<span class="task-sort-indicator" data-sort-key="index">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('name')"><span class="task-sort-label">Task<span class="task-sort-indicator" data-sort-key="name">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('phase')"><span class="task-sort-label">Phase<span class="task-sort-indicator" data-sort-key="phase">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('owner')"><span class="task-sort-label">Owner<span class="task-sort-indicator" data-sort-key="owner">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('priority')"><span class="task-sort-label">Priority<span class="task-sort-indicator" data-sort-key="priority">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('day')"><span class="task-sort-label">Due date<span class="task-sort-indicator" data-sort-key="day">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('status')"><span class="task-sort-label">Status<span class="task-sort-indicator" data-sort-key="status">↕</span></span></th>
+            <th class="task-sortable" onclick="setTaskSort('progress')"><span class="task-sort-label">Progress<span class="task-sort-indicator" data-sort-key="progress">↕</span></span></th>
             <th style="width:80px;">Actions</th>
           </tr>
         </thead>
@@ -443,7 +460,7 @@
     </div>
     <div class="two-col" style="grid-template-columns:1fr 1fr;gap:10px;">
       <div class="form-group" style="margin:0;"><label>Priority</label><select id="pt-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
-      <div class="form-group" style="margin:0;"><label>Due day</label><input id="pt-day" type="number" min="1" max="56" value="1" /></div>
+      <div class="form-group" style="margin:0;"><label>Due date</label><select id="pt-day"></select></div>
     </div>
     <div class="form-group" style="margin-top:10px;"><label>Notes</label><textarea id="pt-notes" placeholder="Optional task notes"></textarea></div>
     <div class="modal-actions">
@@ -483,8 +500,8 @@
     <div class="form-group"><label>Priority</label>
       <select id="f-priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
     </div>
-    <div class="form-group"><label>Due day</label>
-      <input id="f-day" type="number" min="1" max="56" placeholder="e.g. 3" />
+    <div class="form-group"><label>Due date</label>
+      <select id="f-day"></select>
     </div>
     <div class="form-group"><label>Status</label>
       <select id="f-status"><option>To-do</option><option>In progress</option><option>Done</option><option>Blocked</option></select>
@@ -532,6 +549,7 @@ let taskModalPlanId = null;
 let isDemoMode = false;
 let editingPlanId = null;
 let isPlanFormVisible = false;
+let taskSort = { key: null, direction: 'asc' };
 const isDemoPopupMode = new URLSearchParams(window.location.search).get('demo') === '1';
 
 const phases = [
@@ -558,6 +576,8 @@ const weekTemplates = [
 const owners = ['Outgoing SA','Incoming SA','Both','Manager'];
 const priorities = ['High','Medium','Low'];
 const statuses = ['To-do','In progress','Done','Blocked'];
+const priorityRank = { High: 0, Medium: 1, Low: 2 };
+const statusRank = { 'To-do': 0, 'In progress': 1, 'Blocked': 2, 'Done': 3 };
 
 const statusBadge = s => {
   const map = {'To-do':'badge-todo','In progress':'badge-in-progress','Done':'badge-done','Blocked':'badge-blocked'};
@@ -591,6 +611,19 @@ function formatDateInputValue(date) {
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+function formatDisplayDate(dateValue, options = {}) {
+  if(!dateValue) return '';
+  return new Date(`${dateValue}T00:00:00`).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    ...options
+  });
+}
+
+function getDateLabelForDay(day, options = {}) {
+  return formatDisplayDate(getDateForDay(day), options);
 }
 
 function getWeekCountFromPlan(plan) {
@@ -786,9 +819,18 @@ function populateTaskDayInput(inputId, planId, selectedValue = 1) {
   const input = document.getElementById(inputId);
   if(!input) return;
   const maxDay = getMaxDayForPlan(planId);
+  const normalizedValue = Math.min(maxDay, Math.max(1, parseInt(selectedValue, 10) || 1));
+
+  if(input.tagName === 'SELECT') {
+    input.innerHTML = Array.from({ length: maxDay }, (_, idx) => idx + 1)
+      .map(day => `<option value="${day}"${day === normalizedValue ? ' selected' : ''}>${escapeHtml(getDateLabelForDay(day))}</option>`)
+      .join('');
+    return;
+  }
+
   input.min = '1';
   input.max = String(maxDay);
-  input.value = String(Math.min(maxDay, Math.max(1, parseInt(selectedValue, 10) || 1)));
+  input.value = String(normalizedValue);
 }
 
 function setPlanFormMode(planId = null) {
@@ -1137,7 +1179,7 @@ function exportCurrentPlanHtml() {
       <td>${esc(t.phase)}</td>
       <td>${esc(t.owner)}</td>
       <td>${esc(t.priority)}</td>
-      <td>Day ${esc(t.day)}</td>
+      <td>${esc(getDateLabelForDay(t.day))}</td>
       <td>${esc(t.status)}</td>
       <td>${esc(t.progress)}%</td>
       <td>${esc(t.notes || '')}</td>
@@ -1601,7 +1643,9 @@ function renderTasks() {
   const tbody = document.getElementById('taskBody');
   const availablePhases = getPhaseOptionsForPlan();
   const maxDay = getMaxDayForPlan();
-  tbody.innerHTML = tasks.map((t,i) => `
+  const visibleTasks = getSortedTasks();
+  updateTaskSortIndicators();
+  tbody.innerHTML = visibleTasks.map((t,i) => `
     <tr>
       <td style="color:var(--color-text-tertiary);font-size:12px;">${i+1}</td>
       <td>
@@ -1609,7 +1653,7 @@ function renderTasks() {
         ${t.notes ? `<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px;">${t.notes}</div>` : ''}
       </td>
       <td>
-        <select class="select-cell" onchange="updateTaskField(${t.id},'phase',this.value)">
+        <select class="select-cell task-phase-select" onchange="updateTaskField(${t.id},'phase',this.value)">
           ${availablePhases.map(p=>`<option${p===t.phase?' selected':''}>${p}</option>`).join('')}
         </select>
       </td>
@@ -1619,17 +1663,17 @@ function renderTasks() {
         </select>
       </td>
       <td>
-        <select class="select-cell" onchange="updateTaskField(${t.id},'priority',this.value)">
+        <select class="select-cell task-priority-select" onchange="updateTaskField(${t.id},'priority',this.value)">
           ${priorities.map(p=>`<option${p===t.priority?' selected':''}>${p}</option>`).join('')}
         </select>
       </td>
       <td>
         <select class="select-cell" onchange="updateTaskField(${t.id},'day',parseInt(this.value,10))">
-          ${Array.from({length: maxDay}, (_, idx) => idx + 1).map(d=>`<option value="${d}"${d===t.day?' selected':''}>Day ${d}</option>`).join('')}
+          ${Array.from({length: maxDay}, (_, idx) => idx + 1).map(d=>`<option value="${d}"${d===t.day?' selected':''}>${escapeHtml(getDateLabelForDay(d))}</option>`).join('')}
         </select>
       </td>
       <td>
-        <select class="select-cell" onchange="updateTaskField(${t.id},'status',this.value)">
+        <select class="select-cell task-status-select" onchange="updateTaskField(${t.id},'status',this.value)">
           ${statuses.map(s=>`<option${s===t.status?' selected':''}>${s}</option>`).join('')}
         </select>
       </td>
@@ -1645,6 +1689,59 @@ function renderTasks() {
       </td>
     </tr>
   `).join('');
+}
+
+function getTaskSortValue(task, index, key) {
+  switch(key) {
+    case 'index': return index;
+    case 'name': return task.name?.toLowerCase() || '';
+    case 'phase': return phases.indexOf(task.phase);
+    case 'owner': return task.owner?.toLowerCase() || '';
+    case 'priority': return priorityRank[task.priority] ?? Number.MAX_SAFE_INTEGER;
+    case 'day': return Number(task.day) || 0;
+    case 'status': return statusRank[task.status] ?? Number.MAX_SAFE_INTEGER;
+    case 'progress': return Number(task.progress) || 0;
+    default: return index;
+  }
+}
+
+function getSortedTasks() {
+  const tasksWithIndex = tasks.map((task, index) => ({ task, index }));
+  if(!taskSort.key) return tasksWithIndex.map(entry => entry.task);
+
+  const direction = taskSort.direction === 'desc' ? -1 : 1;
+  return tasksWithIndex
+    .slice()
+    .sort((left, right) => {
+      const leftValue = getTaskSortValue(left.task, left.index, taskSort.key);
+      const rightValue = getTaskSortValue(right.task, right.index, taskSort.key);
+
+      if(leftValue < rightValue) return -1 * direction;
+      if(leftValue > rightValue) return 1 * direction;
+      return left.index - right.index;
+    })
+    .map(entry => entry.task);
+}
+
+function updateTaskSortIndicators() {
+  document.querySelectorAll('#taskTable th.task-sortable').forEach(header => {
+    const indicator = header.querySelector('.task-sort-indicator');
+    const key = indicator?.dataset.sortKey;
+    const isActive = key && taskSort.key === key;
+    header.classList.toggle('active', Boolean(isActive));
+    if(indicator) {
+      indicator.textContent = !isActive ? '↕' : (taskSort.direction === 'asc' ? '↑' : '↓');
+    }
+  });
+}
+
+function setTaskSort(key) {
+  if(taskSort.key === key) {
+    taskSort.direction = taskSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    taskSort = { key, direction: 'asc' };
+  }
+  renderTasks();
 }
 
 function changeStatus(id, val) {

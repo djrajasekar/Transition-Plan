@@ -4,12 +4,21 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 
 ## Repository contents
 
-- `Resource_transition_plan_tracker - v2.html` — main application UI and logic
+- `Resource_transition_plan_tracker.html` — main application UI and logic
 - `AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
+
+## Tech stack
+
+- HTML5 single-page application
+- CSS3 with responsive layout, theme variables, gradients, and component styling
+- Vanilla JavaScript (ES6+) for state management, form handling, rendering, and export flows
+- Browser `localStorage` for client-side persistence
+- Chart.js for progress and status visualizations
+- No backend service, package manager, or build step required
 
 ## How to use
 
-1. Open `Resource_transition_plan_tracker - v2.html` in a browser.
+1. Open `Resource_transition_plan_tracker.html` in a browser.
 2. Create a transition plan with outgoing/incoming SA names, project, dates, and number of weeks.
 3. Review the suggested weekly descriptions and change them where needed.
 4. Open a plan to manage tasks, day-by-day tracking, and progress charts.

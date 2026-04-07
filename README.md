@@ -13,6 +13,7 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 - CSS3 with responsive layout, theme variables, gradients, and component styling
 - Vanilla JavaScript (ES6+) for state management, form handling, rendering, and export flows
 - Browser `localStorage` for client-side persistence
+- JSON backup export/import for portable persistence across browser restarts or storage resets
 - Chart.js for progress and status visualizations
 - No backend service, package manager, or build step required
 
@@ -23,13 +24,16 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 3. Review the suggested weekly descriptions and change them where needed.
 4. Open a plan to manage tasks, day-by-day tracking, and progress charts.
 5. Use `Demo` to preview the latest sample data and screen behavior.
-6. Use `Export Plan` to download a portable HTML summary for the selected plan.
+6. Use `Save Backup` to download a full JSON backup of all plans and `Load Backup` to restore it later.
+7. Use `Export Plan` to download a portable HTML summary for the selected plan.
 
 ## Current features
 
 - configurable `1–8` week transition plans
 - editable weekly focus and week descriptions
 - plan edit/delete support
+- autosave for active plan metadata and daily notes
+- full backup and restore for all plans, tasks, weekly descriptions, and day notes
 - task counts and separated scheduled / ongoing / completed sections
 - day-by-day task tracker and progress charts
 - demo screen aligned with the latest workflow changes

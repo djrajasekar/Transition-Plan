@@ -209,10 +209,13 @@
     <div class="header-actions">
       <button id="homeBtn" class="btn btn-sm hidden" onclick="goHome()">Home</button>
       <button id="demoBtn" class="btn btn-sm" onclick="openDemoWindow()">Demo</button>
+      <button id="saveBackupBtn" class="btn btn-sm" onclick="downloadBackupFile()">Save Backup</button>
+      <button id="loadBackupBtn" class="btn btn-sm" onclick="openBackupFilePicker()">Load Backup</button>
       <button id="exportPlanBtn" class="btn btn-sm hidden" onclick="exportCurrentPlanHtml()">Export Plan</button>
       <button id="backToPlansBtn" class="btn btn-sm hidden" onclick="backToPlans()">Back to Plans</button>
     </div>
   </div>
+  <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)" />
 
   <div class="meta-row" id="trackerMetaRow">
     <div class="meta-card"><label>Outgoing SA</label><input id="m-outgoing" value="" /></div>
@@ -596,7 +599,8 @@ const escapeHtml = value => String(value ?? '')
 
 let statusChart, phaseChart, burnChart, barChart;
 let ongoingStatusChart;
-const APP_STORAGE_KEY = 'saTransitionPlannerStateV1';
+const APP_STORAGE_KEY = 'saTransitionPlannerStateV2';
+const LEGACY_APP_STORAGE_KEYS = ['saTransitionPlannerStateV1'];
 
 /**********************************************
  * Week-planning helpers keep duration, labels,
@@ -1013,6 +1017,7 @@ let nextPlanId = 1;
 const taskTemplate = tasks.map(({ id, ...rest }) => ({ ...rest, status: 'To-do', progress: 0 }));
 let planTaskStore = {};
 let weeklyPlanStore = {};
+let dailyNotesStore = {};
 
 /**********************************************
  * Demo and persistence flows preserve the last
@@ -1054,6 +1059,7 @@ function goHome() {
   tasks = [];
   planTaskStore = {};
   weeklyPlanStore = {};
+  dailyNotesStore = {};
   nextPlanId = 1;
   nextId = 1;
 
@@ -1089,6 +1095,7 @@ function persistAppState() {
       plans,
       planTaskStore,
       weeklyPlanStore,
+      dailyNotesStore,
       nextPlanId,
       nextId,
       currentPlanId,
@@ -1103,58 +1110,137 @@ function persistAppState() {
   }
 }
 
-function loadPersistedState() {
-  if(isDemoPopupMode) return false;
+function getStoredAppState() {
+  const storageKeys = [APP_STORAGE_KEY, ...LEGACY_APP_STORAGE_KEYS];
+  for(const storageKey of storageKeys) {
+    const raw = localStorage.getItem(storageKey);
+    if(raw) return { raw, storageKey };
+  }
+  return null;
+}
 
-  try {
-    const raw = localStorage.getItem(APP_STORAGE_KEY);
-    if(!raw) return false;
+function applyAppState(state) {
+  if(!state || typeof state !== 'object') return false;
 
-    const state = JSON.parse(raw);
-    if(!state || typeof state !== 'object') return false;
+  plans = Array.isArray(state.plans) ? state.plans : [];
+  planTaskStore = state.planTaskStore && typeof state.planTaskStore === 'object' ? state.planTaskStore : {};
+  weeklyPlanStore = state.weeklyPlanStore && typeof state.weeklyPlanStore === 'object' ? state.weeklyPlanStore : {};
+  dailyNotesStore = state.dailyNotesStore && typeof state.dailyNotesStore === 'object' ? state.dailyNotesStore : {};
+  nextPlanId = Number.isInteger(state.nextPlanId) ? state.nextPlanId : 1;
+  nextId = Number.isInteger(state.nextId) ? state.nextId : 1;
+  currentPlanId = state.currentPlanId ?? null;
+  isPlanSelected = Boolean(state.isPlanSelected);
+  isDemoMode = Boolean(state.isDemoMode);
+  selectedDay = Number.isInteger(state.selectedDay) ? state.selectedDay : null;
 
-    plans = Array.isArray(state.plans) ? state.plans : [];
-    planTaskStore = state.planTaskStore && typeof state.planTaskStore === 'object' ? state.planTaskStore : {};
-    weeklyPlanStore = state.weeklyPlanStore && typeof state.weeklyPlanStore === 'object' ? state.weeklyPlanStore : {};
-    nextPlanId = Number.isInteger(state.nextPlanId) ? state.nextPlanId : 1;
-    nextId = Number.isInteger(state.nextId) ? state.nextId : 1;
-    currentPlanId = state.currentPlanId ?? null;
-    isPlanSelected = Boolean(state.isPlanSelected);
-    isDemoMode = Boolean(state.isDemoMode);
-    selectedDay = Number.isInteger(state.selectedDay) ? state.selectedDay : null;
-
-    if(currentPlanId && planTaskStore[currentPlanId]) {
-      const currentPlan = plans.find(p => p.id === currentPlanId);
-      if(currentPlan) {
-        ensureWeeklyPlan(currentPlan);
-        normalizeTasksForPlan(currentPlanId);
-        tasks = planTaskStore[currentPlanId].map(t => ({ ...t }));
-        document.getElementById('m-outgoing').value = currentPlan.outgoing || '';
-        document.getElementById('m-incoming').value = currentPlan.incoming || '';
-        document.getElementById('m-project').value = currentPlan.project || '';
-        document.getElementById('m-start').value = currentPlan.start || '';
-        document.getElementById('m-end').value = currentPlan.end || '';
-        document.getElementById('m-status').value = currentPlan.status || 'Planning';
-      } else {
-        currentPlanId = null;
-        isPlanSelected = false;
-        tasks = [];
-      }
+  if(currentPlanId && planTaskStore[currentPlanId]) {
+    const currentPlan = plans.find(p => p.id === currentPlanId);
+    if(currentPlan) {
+      ensureWeeklyPlan(currentPlan);
+      normalizeTasksForPlan(currentPlanId);
+      tasks = planTaskStore[currentPlanId].map(t => ({ ...t }));
+      document.getElementById('m-outgoing').value = currentPlan.outgoing || '';
+      document.getElementById('m-incoming').value = currentPlan.incoming || '';
+      document.getElementById('m-project').value = currentPlan.project || '';
+      document.getElementById('m-start').value = currentPlan.start || '';
+      document.getElementById('m-end').value = currentPlan.end || '';
+      document.getElementById('m-status').value = currentPlan.status || 'Planning';
     } else {
       currentPlanId = null;
       isPlanSelected = false;
       tasks = [];
     }
+  } else {
+    currentPlanId = null;
+    isPlanSelected = false;
+    tasks = [];
+  }
 
-    resetPlanForm();
+  resetPlanForm();
+  renderAll();
+  updateTrackerVisibility();
+  switchTab(isPlanSelected ? (state.activeTab || 'progress') : 'plans');
+  return true;
+}
 
-    renderAll();
-    updateTrackerVisibility();
-    switchTab(isPlanSelected ? (state.activeTab || 'progress') : 'plans');
+function loadPersistedState() {
+  if(isDemoPopupMode) return false;
+
+  try {
+    const stored = getStoredAppState();
+    if(!stored) return false;
+
+    const state = JSON.parse(stored.raw);
+    if(!applyAppState(state)) return false;
+    if(stored.storageKey !== APP_STORAGE_KEY) persistAppState();
     return true;
   } catch (e) {
     return false;
   }
+}
+
+/**********************************************
+ * Backup helpers provide a portable JSON copy
+ * when browser storage is not stable enough.
+ **********************************************/
+function buildBackupState() {
+  persistCurrentPlanTasks();
+  return {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    plans,
+    planTaskStore,
+    weeklyPlanStore,
+    dailyNotesStore,
+    nextPlanId,
+    nextId,
+    currentPlanId,
+    isPlanSelected,
+    isDemoMode,
+    selectedDay,
+    activeTab: document.querySelector('.tab.active')?.dataset?.tab || 'plans'
+  };
+}
+
+function downloadBackupFile() {
+  if(isDemoPopupMode) return;
+
+  const backupState = buildBackupState();
+  const blob = new Blob([JSON.stringify(backupState, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sa-transition-plan-backup-${todayIso()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function openBackupFilePicker() {
+  const fileInput = document.getElementById('backupFileInput');
+  if(fileInput) fileInput.click();
+}
+
+function importBackupFile(event) {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const state = JSON.parse(String(reader.result || '{}'));
+      if(!applyAppState(state)) {
+        alert('The selected backup file is not valid for this tracker.');
+        return;
+      }
+      persistAppState();
+    } catch (error) {
+      alert('Unable to load that backup file. Please choose a valid tracker backup JSON file.');
+    }
+  };
+  reader.readAsText(file);
 }
 
 function exportCurrentPlanHtml() {
@@ -1420,6 +1506,7 @@ function deletePlan(planId) {
   plans = plans.filter(p => p.id !== planId);
   delete planTaskStore[planId];
   delete weeklyPlanStore[planId];
+  delete dailyNotesStore[planId];
 
   if(currentPlanId === planId) {
     currentPlanId = null;
@@ -1785,6 +1872,7 @@ function renderDaily() {
   const dt = tasks.filter(t=>t.day===selectedDay);
   const phaseLabel = dt[0] ? dt[0].phase : 'No phase assigned';
   const isToday = selectedDay === today;
+  const dayNotes = dailyNotesStore[currentPlanId]?.[selectedDay] || '';
   grid.innerHTML = `
     <div class="day-selector">
       ${days.map(d => `<button class="day-chip${d===selectedDay?' selected':''}" onclick="setSelectedDay(${d})">D${d}</button>`).join('')}
@@ -1807,9 +1895,16 @@ function renderDaily() {
           </div>
         `).join('') : `<div style="font-size:12px;color:var(--color-text-secondary);padding:4px 0;">No tasks scheduled for this day.</div>`}
       </div>
-      <textarea class="notes-input" rows="2" placeholder="Add daily notes for day ${selectedDay}..."></textarea>
+      <textarea class="notes-input" rows="2" placeholder="Add daily notes for day ${selectedDay}..." oninput="setDailyNote(this.value)">${escapeHtml(dayNotes)}</textarea>
     </div>
   `;
+}
+
+function setDailyNote(value) {
+  if(!currentPlanId || !selectedDay) return;
+  if(!dailyNotesStore[currentPlanId]) dailyNotesStore[currentPlanId] = {};
+  dailyNotesStore[currentPlanId][selectedDay] = value;
+  persistAppState();
 }
 
 function getDateForDay(day) {
@@ -2030,6 +2125,13 @@ if(isDemoPopupMode) {
   loadDemoData();
 }
 
+['m-outgoing', 'm-incoming', 'm-project'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    persistCurrentPlanTasks();
+    renderPlansPanel();
+    persistAppState();
+  });
+});
 document.getElementById('m-start').addEventListener('change', () => renderDaily());
 document.getElementById('m-status').addEventListener('change', () => {
   persistCurrentPlanTasks();
@@ -2050,6 +2152,7 @@ document.getElementById('m-end').addEventListener('change', () => {
 });
 document.getElementById('p-start').addEventListener('change', onPlanWeeksChange);
 document.getElementById('p-end').addEventListener('change', () => renderPlanSetupWeeks());
+window.addEventListener('beforeunload', () => persistAppState());
 </script>
 </body>
 </html>

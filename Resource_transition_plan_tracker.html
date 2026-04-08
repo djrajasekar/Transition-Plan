@@ -1293,9 +1293,11 @@ function exportCurrentPlanHtml() {
     .card { background:#f5f5f2; border-radius:8px; padding:10px 12px; }
     .label { font-size:11px; color:#6b6b67; text-transform:uppercase; letter-spacing:.05em; }
     .val { font-size:14px; font-weight:600; margin-top:3px; }
+    .table-wrap { overflow-x:auto; }
     table { width:100%; border-collapse:collapse; font-size:13px; }
-    th, td { border:1px solid #e3e3dd; padding:8px 10px; text-align:left; vertical-align:top; }
+    th, td { border:1px solid #e3e3dd; padding:8px 10px; text-align:left; vertical-align:top; white-space:nowrap; }
     th { background:#f5f5f2; }
+    th:nth-child(2), td:nth-child(2), th:nth-child(9), td:nth-child(9) { white-space:normal; }
     .small { font-size:12px; color:#6b6b67; margin-top:8px; }
   </style>
 </head>
@@ -1311,14 +1313,16 @@ function exportCurrentPlanHtml() {
       <div class="card"><div class="label">End Date</div><div class="val">${esc(plan.end)}</div></div>
       <div class="card"><div class="label">Status</div><div class="val">${esc(plan.status)}</div></div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th><th>Task</th><th>Phase</th><th>Owner</th><th>Priority</th><th>Due</th><th>Status</th><th>Progress</th><th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Task</th><th>Phase</th><th>Owner</th><th>Priority</th><th>Due</th><th>Status</th><th>Progress</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>`;

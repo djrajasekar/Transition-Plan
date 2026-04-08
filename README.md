@@ -63,5 +63,5 @@ This project is a standalone browser app, so there is currently **no automated t
 
 ## Verified status
 
-- VS Code error check for `Resource_transition_plan_tracker - v2.html`: **No errors found**
+- VS Code error check for `Resource_transition_plan_tracker.html`: **No errors found**
 - Validation date: `2026-04-06`

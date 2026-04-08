@@ -1256,7 +1256,19 @@ function exportCurrentPlanHtml() {
     return;
   }
 
-  const planTasks = (planTaskStore[currentPlanId] || tasks || []).map(t => ({ ...t }));
+  const planTasks = (planTaskStore[currentPlanId] || tasks || [])
+    .map((task, index) => ({ ...task, __exportIndex: index }))
+    .sort((left, right) => {
+      const leftDay = Number(left.day) || Number.MAX_SAFE_INTEGER;
+      const rightDay = Number(right.day) || Number.MAX_SAFE_INTEGER;
+      if(leftDay !== rightDay) return leftDay - rightDay;
+
+      const leftPriority = priorityRank[left.priority] ?? Number.MAX_SAFE_INTEGER;
+      const rightPriority = priorityRank[right.priority] ?? Number.MAX_SAFE_INTEGER;
+      if(leftPriority !== rightPriority) return leftPriority - rightPriority;
+
+      return left.__exportIndex - right.__exportIndex;
+    });
   const esc = (v) => String(v ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

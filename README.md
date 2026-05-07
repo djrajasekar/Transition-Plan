@@ -9,15 +9,13 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 - Plan edit/delete support
 - Autosave for active plan metadata and daily notes
 - Full backup and restore for all plans, tasks, weekly descriptions, and day notes
-- Task counts and separated scheduled / ongoi![1778175960289](image/README/1778175960289.png)g / completed sections
+- Task counts and separated scheduled / ongoing / completed sections
 - Day-by-day task tracker and progress charts
 - Demo screen aligned with the latest workflow changes
 
 ## Screenshots
 
 ![1778175632218](image/README/1778175632218.png)
-
-
 
 ![1778175753609](image/README/1778175753609.png)
 
@@ -89,6 +87,6 @@ This project is a standalone browser app, so there is currently **no automated t
 
 ## Author
 
-**DJ Rajasekar**  
-[LinkedIn](https://www.linkedin.com/in/djrajasekar/)  
+**DJ Rajasekar**
+[LinkedIn](https://www.linkedin.com/in/djrajasekar/)
 [GitHub](https://github.com/djrajasekar)

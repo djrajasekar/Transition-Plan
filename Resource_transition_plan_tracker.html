@@ -1445,17 +1445,20 @@ function renderPlansPanel() {
     </tr>
   `).join('') : `<tr><td colspan="7" style="color:var(--color-text-secondary);">No completed plans.</td></tr>`;
 
-  const chartPlans = plans.filter(p => toDate(p.start) <= today);
-  const ongoingStatusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0, 'Completed': 0 };
+
+
+  // Use both ongoing and completed plans for the chart
+  const chartPlans = [...ongoing, ...completed];
+  const statusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0, 'Completed': 0 };
   chartPlans.forEach(p => {
     const status = classifyPlanStatus(p);
-    if(ongoingStatusCounts[status] !== undefined) ongoingStatusCounts[status] += 1;
+    if(statusCounts[status] !== undefined) statusCounts[status] += 1;
   });
 
-  const totalOngoing = Object.values(ongoingStatusCounts).reduce((sum, value) => sum + value, 0);
-  const chartLabels = totalOngoing === 0 ? ['No ongoing plans'] : Object.keys(ongoingStatusCounts);
-  const chartData = totalOngoing === 0 ? [1] : Object.values(ongoingStatusCounts);
-  const chartColors = totalOngoing === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A', '#639922'];
+  const totalPlans = Object.values(statusCounts).reduce((sum, value) => sum + value, 0);
+  const chartLabels = totalPlans === 0 ? ['No plans'] : Object.keys(statusCounts);
+  const chartData = totalPlans === 0 ? [1] : Object.values(statusCounts);
+  const chartColors = totalPlans === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A', '#639922'];
 
   if(ongoingStatusChart) ongoingStatusChart.destroy();
   ongoingStatusChart = new Chart(document.getElementById('ongoingStatusChart'), {
@@ -2062,7 +2065,7 @@ function renderAll() {
   renderSummary();
   renderPlanSetupWeeks();
   renderWeeklyPlan();
-  renderPlansPanel();
+  renderPlansPanel(); // Always update plans panel and chart
   if(document.getElementById('tab-progress').classList.contains('active')) renderCharts();
   persistAppState();
 }

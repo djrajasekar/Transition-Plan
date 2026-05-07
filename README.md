@@ -9,7 +9,7 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 - Plan edit/delete support
 - Autosave for active plan metadata and daily notes
 - Full backup and restore for all plans, tasks, weekly descriptions, and day notes
-- Task counts and separated scheduled / ongoing / completed sections
+- Task counts and separated scheduled / ongoi![1778175960289](image/README/1778175960289.png)g / completed sections
 - Day-by-day task tracker and progress charts
 - Demo screen aligned with the latest workflow changes
 
@@ -17,9 +17,11 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 
 ![1778175632218](image/README/1778175632218.png)
 
+
+
 ![1778175753609](image/README/1778175753609.png)
 
-![1778175807907](image/README/1778175807907.png)
+![1778176051758](image/README/1778176051758.png)
 
 ## Repository contents
 
@@ -84,3 +86,9 @@ This project is a standalone browser app, so there is currently **no automated t
 
 - VS Code error check for `Resource_transition_plan_tracker.html`: **No errors found**
 - Validation date: `2026-04-06`
+
+## Author
+
+**DJ Rajasekar**  
+[LinkedIn](https://www.linkedin.com/in/djrajasekar/)  
+[GitHub](https://github.com/djrajasekar)

@@ -614,12 +614,7 @@
       </select>
     </div>
     <div class="form-group"><label>Owner</label>
-      <select id="pt-owner">
-        <option>Outgoing SA</option>
-        <option>Incoming SA</option>
-        <option>Both</option>
-        <option>Manager</option>
-      </select>
+      <select id="pt-owner"></select>
     </div>
     <div class="two-col" style="grid-template-columns:1fr 1fr;gap:10px;">
       <div class="form-group" style="margin:0;"><label>Priority</label><select id="pt-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
@@ -673,12 +668,7 @@
       </select>
     </div>
     <div class="form-group"><label>Owner</label>
-      <select id="f-owner">
-        <option>Outgoing SA</option>
-        <option>Incoming SA</option>
-        <option>Both</option>
-        <option>Manager</option>
-      </select>
+      <select id="f-owner"></select>
     </div>
     <div class="form-group"><label>Priority</label>
       <select id="f-priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
@@ -1042,6 +1032,22 @@ function setPlanFormVisibility(isVisible) {
   const section = document.getElementById('planSetupSection');
   if(section) section.classList.toggle('hidden', !isPlanFormVisible);
   setPlanFormMode(editingPlanId);
+
+  // Hide all plan tables and charts below the setup section when editing
+  const isEditing = editingPlanId !== null && isPlanFormVisible;
+  // Hide by direct IDs/classes for reliability
+  const hideIds = [
+    // Ongoing plans by status chart
+    ...Array.from(document.querySelectorAll('#tab-plans > .chart-wrap')).slice(1,2),
+    // Scheduled plans table
+    ...Array.from(document.querySelectorAll('#tab-plans > .table-caption')).slice(0,1),
+    ...Array.from(document.querySelectorAll('#tab-plans > .table-wrap')).slice(0,1),
+    // Ongoing plans section
+    document.getElementById('ongoingPlansSection'),
+    // Completed plans section
+    document.getElementById('completedPlansSection')
+  ];
+  hideIds.forEach(el => { if(el) el.classList.toggle('hidden', isEditing); });
 }
 
 function showPlanForm() {
@@ -1062,6 +1068,15 @@ function resetPlanForm() {
   renderPlanSetupWeeks();
   setPlanFormMode(null);
   setPlanFormVisibility(false);
+  // Unhide all below sections when not editing
+  const hideIds = [
+    ...Array.from(document.querySelectorAll('#tab-plans > .chart-wrap')).slice(1,2),
+    ...Array.from(document.querySelectorAll('#tab-plans > .table-caption')).slice(0,1),
+    ...Array.from(document.querySelectorAll('#tab-plans > .table-wrap')).slice(0,1),
+    document.getElementById('ongoingPlansSection'),
+    document.getElementById('completedPlansSection')
+  ];
+  hideIds.forEach(el => { if(el) el.classList.remove('hidden'); });
 }
 
 function editPlan(planId) {
@@ -1673,7 +1688,15 @@ function openPlanTaskModal(planId) {
   document.getElementById('planTaskModalTitle').textContent = `Add task to ${plan.outgoing} → ${plan.incoming}`;
   document.getElementById('pt-name').value = '';
   populateTaskPhaseSelect('pt-phase', planId, getPhaseOptionsForPlan(planId)[0]);
-  document.getElementById('pt-owner').value = 'Incoming SA';
+  // Populate owner dropdown with actual names
+  const ptOwner = document.getElementById('pt-owner');
+  ptOwner.innerHTML = [
+    plan.outgoing ? `<option>${escapeHtml(plan.outgoing)}</option>` : '',
+    plan.incoming ? `<option>${escapeHtml(plan.incoming)}</option>` : '',
+    (plan.outgoing && plan.incoming) ? `<option>Both</option>` : '',
+    `<option>Manager</option>`
+  ].join('');
+  ptOwner.value = plan.incoming || '';
   document.getElementById('pt-priority').value = 'Medium';
   populateTaskDayInput('pt-day', planId, 1);
   document.getElementById('pt-notes').value = '';
@@ -1971,6 +1994,14 @@ function renderTasks() {
   const maxDay = getMaxDayForPlan();
   const visibleTasks = getSortedTasks();
   updateTaskSortIndicators();
+  // Use actual outgoing/incoming names for owner dropdown
+  const plan = plans.find(p => p.id === currentPlanId);
+  const ownerOptions = plan ? [
+    plan.outgoing ? plan.outgoing : null,
+    plan.incoming ? plan.incoming : null,
+    (plan.outgoing && plan.incoming) ? 'Both' : null,
+    'Manager'
+  ].filter(Boolean) : owners;
   tbody.innerHTML = visibleTasks.map((t,i) => `
     <tr>
       <td style="color:var(--color-text-tertiary);font-size:12px;">${i+1}</td>
@@ -1985,7 +2016,7 @@ function renderTasks() {
       </td>
       <td>
         <select class="select-cell" onchange="updateTaskField(${t.id},'owner',this.value)">
-          ${owners.map(o=>`<option${o===t.owner?' selected':''}>${o}</option>`).join('')}
+          ${ownerOptions.map(o=>`<option${o===t.owner?' selected':''}>${escapeHtml(o)}</option>`).join('')}
         </select>
       </td>
       <td>
@@ -2303,7 +2334,18 @@ function openAddModal() {
   document.getElementById('modalTitle').textContent = 'Add task';
   ['f-name','f-notes'].forEach(id => document.getElementById(id).value = '');
   populateTaskPhaseSelect('f-phase', currentPlanId, getPhaseOptionsForPlan()[0]);
-  document.getElementById('f-owner').value = 'Incoming SA';
+  // Populate owner dropdown with actual names for add modal
+  const plan = plans.find(p => p.id === currentPlanId);
+  const fOwner = document.getElementById('f-owner');
+  if (plan && fOwner) {
+    fOwner.innerHTML = [
+      plan.outgoing ? `<option>${escapeHtml(plan.outgoing)}</option>` : '',
+      plan.incoming ? `<option>${escapeHtml(plan.incoming)}</option>` : '',
+      (plan.outgoing && plan.incoming) ? `<option>Both</option>` : '',
+      `<option>Manager</option>`
+    ].join('');
+    fOwner.value = plan.incoming || '';
+  }
   document.getElementById('f-priority').value = 'Medium';
   document.getElementById('f-status').value = 'To-do';
   document.getElementById('f-progress').value = 0;
@@ -2317,7 +2359,18 @@ function openEdit(id) {
   document.getElementById('modalTitle').textContent = 'Edit task';
   document.getElementById('f-name').value = t.name;
   populateTaskPhaseSelect('f-phase', currentPlanId, t.phase);
-  document.getElementById('f-owner').value = t.owner;
+  // Populate owner dropdown with actual names for edit modal
+  const plan = plans.find(p => p.id === currentPlanId);
+  const fOwner = document.getElementById('f-owner');
+  if (plan && fOwner) {
+    fOwner.innerHTML = [
+      plan.outgoing ? `<option>${escapeHtml(plan.outgoing)}</option>` : '',
+      plan.incoming ? `<option>${escapeHtml(plan.incoming)}</option>` : '',
+      (plan.outgoing && plan.incoming) ? `<option>Both</option>` : '',
+      `<option>Manager</option>`
+    ].join('');
+    fOwner.value = t.owner;
+  }
   document.getElementById('f-priority').value = t.priority;
   populateTaskDayInput('f-day', currentPlanId, t.day);
   document.getElementById('f-status').value = t.status;

@@ -1,9 +1,30 @@
 <!DOCTYPE html>
 <!--
-  Author: DJ Rajasekar
-  GitHub: https://github.com/djrajasekar
-  Repository: https://github.com/djrajasekar/Transition-Plan
-  Note: Embedded author reference for easy recall when this HTML file is shared.
+*******************************************************************************
+* Resource Transition Plan Tracker
+*
+* Author: DJ Rajasekar
+* Repository: https://github.com/djrajasekar/Transition-Plan
+*
+* PURPOSE:
+*   - Structured onboarding and handover tracker for Software Architects (SAs)
+*   - Enables plan creation, task tracking, weekly review, and progress visualization
+*   - Designed for clarity, maintainability, and onboarding new users quickly
+*
+* MAJOR SECTIONS:
+*   - Shared UI layout and theme styles
+*   - Plan setup, review, and portfolio management
+*   - Task management and daily view
+*   - Progress and charts (status visualization)
+*   - Data persistence, backup, and restore
+*   - Demo mode for safe experimentation
+*
+* COMMENTING & DOCS STYLE (per AGENTS.md):
+*   - Each major section is marked with a 3-line banner comment (******** style)
+*   - Comments explain why a block exists, its responsibility, and key assumptions
+*   - Comments are updated with code changes to keep documentation trustworthy
+*   - Code is kept readable, focused, and avoids unnecessary dependencies
+*******************************************************************************
 -->
 <html lang="en">
 <head>
@@ -12,8 +33,9 @@
 <title>SA Resource Transition Plan</title>
 <style>
   /**********************************************
-   * Shared layout, theme, and component styling
-   * for the transition planning workspace UI.
+   ******** SHARED LAYOUT & THEME ********
+   * Styles for layout, theme, and UI components
+   * Used across all panels and views
    **********************************************/
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -102,8 +124,18 @@
   .section-head h2 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
   .btn { padding: 7px 14px; font-size: 13px; border: 1px solid rgba(55,138,221,0.18); border-radius: var(--border-radius-md); background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,244,231,0.92)); color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); box-shadow: 0 4px 14px rgba(52,39,34,0.06); transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease; }
   .btn:hover { background: linear-gradient(180deg, rgba(250,199,117,0.18), rgba(255,244,231,0.95)); box-shadow: 0 8px 20px rgba(52,39,34,0.10); transform: translateY(-1px); }
-  .btn-primary { background: linear-gradient(135deg, var(--color-accent-primary), #f08b52); color: #fffaf6; border-color: transparent; }
-  .btn-primary:hover { background: linear-gradient(135deg, #c84f29, #e47841); opacity: 1; }
+  .btn-primary {
+    background: linear-gradient(135deg, #d85a30 60%, #f08b52 100%);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(216,90,48,0.10);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #c84f29 60%, #e47841 100%);
+    color: #fff;
+    opacity: 1;
+  }
   .btn-sm { padding: 4px 10px; font-size: 12px; }
   .table-wrap { overflow-x: auto; background: rgba(255,255,255,0.92); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); box-shadow: 0 10px 24px rgba(52,39,34,0.06); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -204,6 +236,13 @@
 </style>
 </head>
 <body>
+<!--
+*******************************************************************************
+* MAIN APP CONTAINER & HEADER
+* - Contains the app shell, header, and navigation actions
+* - Header provides context, quick actions, and demo/home/export controls
+*******************************************************************************
+-->
 <div class="container">
 <div class="app">
   <div class="header">
@@ -243,9 +282,13 @@
     <button class="tab hidden" data-tab="daily" onclick="switchTab('daily',this)">Day-by-day</button>
   </div>
 
-  <!-- *************************************** -->
-  <!-- Plan setup, review, and portfolio panel -->
-  <!-- *************************************** -->
+  <!--
+  *******************************************************************************
+  * PLAN SETUP, REVIEW, AND PORTFOLIO PANEL
+  * - Allows users to create, edit, and review transition plans
+  * - Includes plan form, weekly setup, and plan portfolio table
+  *******************************************************************************
+  -->
   <div class="panel active" id="tab-plans">
     <div class="section-head">
       <h2>Plan setup and portfolio</h2>
@@ -297,6 +340,14 @@
 
     <div class="chart-wrap">
       <div class="chart-title">Ongoing plans by status</div>
+      <!--
+      *******************************************************************************
+      * ONGOING PLANS STATUS CHART
+      * - Visualizes the count of plans by status (In Progress, On Hold, Overdue, Completed)
+      * - Uses Chart.js for doughnut chart rendering
+      * - Data source: all visible ongoing and completed plans
+      *******************************************************************************
+      -->
       <div style="position:relative;width:100%;height:260px;"><canvas id="ongoingStatusChart"></canvas></div>
     </div>
 
@@ -305,14 +356,14 @@
       <table class="mini-table">
         <thead>
           <tr>
-            <th>Combination</th>
-            <th>Project</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Tasks</th>
-            <th>Status</th>
-            <th style="width:90px;">Add task</th>
+            <th style="min-width:120px;">Project</th>
+            <th style="min-width:90px;">Start</th>
+            <th style="min-width:90px;">End</th>
+            <th style="min-width:60px;">Tasks</th>
+            <th style="min-width:90px;">Status</th>
             <th style="width:180px;">Actions</th>
+            <th style="width:90px;">Add task</th>
+            <th style="min-width:110px;">Progress</th>
           </tr>
         </thead>
         <tbody id="scheduledPlansBody"></tbody>
@@ -325,13 +376,14 @@
       <table class="mini-table">
         <thead>
           <tr>
-            <th>Combination</th>
-            <th>Project</th>
-            <th>Tasks</th>
-            <th>Progress</th>
-            <th>Status</th>
-            <th style="width:90px;">Add task</th>
+            <th style="min-width:120px;">Project</th>
+            <th style="min-width:90px;">Start</th>
+            <th style="min-width:90px;">End</th>
+            <th style="min-width:60px;">Tasks</th>
+            <th style="min-width:90px;">Status</th>
             <th style="width:180px;">Actions</th>
+            <th style="width:90px;">Add task</th>
+            <th style="min-width:110px;">Progress</th>
           </tr>
         </thead>
         <tbody id="ongoingPlansBody"></tbody>
@@ -345,13 +397,14 @@
         <table class="mini-table">
           <thead>
             <tr>
-              <th>Combination</th>
-              <th>Project</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Tasks</th>
-              <th>Status</th>
-              <th style="width:220px;">Actions</th>
+              <th style="min-width:120px;">Project</th>
+              <th style="min-width:90px;">Start</th>
+              <th style="min-width:90px;">End</th>
+              <th style="min-width:60px;">Tasks</th>
+              <th style="min-width:90px;">Status</th>
+              <th style="width:180px;">Actions</th>
+              <th style="width:90px;">Add task</th>
+              <th style="min-width:110px;">Progress</th>
             </tr>
           </thead>
           <tbody id="completedPlansBody"></tbody>
@@ -446,7 +499,27 @@
 <div class="modal-overlay" id="planTaskModalOverlay" style="display:none;" onclick="if(event.target===this)closePlanTaskModal()">
   <div class="modal">
     <h3 id="planTaskModalTitle">Add task to plan</h3>
-    <div class="form-group"><label>Task name</label><input id="pt-name" placeholder="e.g. Stakeholder introduction meeting" /></div>
+    <div class="form-group"><label>Task name</label>
+      <select id="pt-task-dropdown" onchange="document.getElementById('pt-name').value=this.value" style="margin-bottom:6px;width:100%;">
+        <option value="">-- Select a common task --</option>
+        <option>Introduce incoming SA to all key stakeholders</option>
+        <option>Review current architecture documentation</option>
+        <option>Access provisioning — all tools and systems</option>
+        <option>Walkthrough of open RFCs and decisions</option>
+        <option>Shadow client meetings and calls</option>
+        <option>Review runbooks and incident playbooks</option>
+        <option>Technical deep-dive: cloud infra and pipelines</option>
+        <option>Handover client relationship ownership</option>
+        <option>Transfer backlog and sprint planning responsibilities</option>
+        <option>Review and update all architecture docs</option>
+        <option>Lead first client architecture review independently</option>
+        <option>Outgoing SA available for questions (async)</option>
+        <option>Handover final documentation and credentials</option>
+        <option>Transition completion sign-off</option>
+        <option>Review lessons learned and optimize working rhythm</option>
+      </select>
+      <input id="pt-name" placeholder="e.g. Stakeholder introduction meeting" />
+    </div>
     <div class="form-group"><label>Phase</label>
       <select id="pt-phase">
         <option>Week 1 — Orientation</option>
@@ -485,7 +558,27 @@
 <div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3 id="modalTitle">Add task</h3>
-    <div class="form-group"><label>Task name</label><input id="f-name" placeholder="e.g. Handover architecture diagrams" /></div>
+    <div class="form-group"><label>Task name</label>
+      <select id="f-task-dropdown" onchange="document.getElementById('f-name').value=this.value" style="margin-bottom:6px;width:100%;">
+        <option value="">-- Select a common task --</option>
+        <option>Introduce incoming SA to all key stakeholders</option>
+        <option>Review current architecture documentation</option>
+        <option>Access provisioning — all tools and systems</option>
+        <option>Walkthrough of open RFCs and decisions</option>
+        <option>Shadow client meetings and calls</option>
+        <option>Review runbooks and incident playbooks</option>
+        <option>Technical deep-dive: cloud infra and pipelines</option>
+        <option>Handover client relationship ownership</option>
+        <option>Transfer backlog and sprint planning responsibilities</option>
+        <option>Review and update all architecture docs</option>
+        <option>Lead first client architecture review independently</option>
+        <option>Outgoing SA available for questions (async)</option>
+        <option>Handover final documentation and credentials</option>
+        <option>Transition completion sign-off</option>
+        <option>Review lessons learned and optimize working rhythm</option>
+      </select>
+      <input id="f-name" placeholder="e.g. Handover architecture diagrams" />
+    </div>
     <div class="form-group"><label>Phase</label>
       <select id="f-phase">
         <option>Week 1 — Orientation</option>
@@ -1387,13 +1480,11 @@ function renderPlansPanel() {
 
   scheduledBody.innerHTML = scheduled.length ? scheduled.map(p => `
     <tr>
-      <td>${p.outgoing} → ${p.incoming}</td>
       <td>${p.project}</td>
       <td>${p.start}</td>
       <td>${p.end}</td>
       <td>${getTaskCount(p.id)}</td>
       <td>${classifyPlanStatus(p)}</td>
-      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn btn-sm" onclick="openPlan(${p.id})">Open</button>
@@ -1401,35 +1492,18 @@ function renderPlansPanel() {
           <button class="btn btn-sm" onclick="editPlan(${p.id})">Edit</button>
         </div>
       </td>
-    </tr>
-  `).join('') : `<tr><td colspan="8" style="color:var(--color-text-secondary);">No scheduled plans.</td></tr>`;
-
-  ongoingBody.innerHTML = ongoing.length ? ongoing.map(p => `
-    <tr>
-      <td>${p.outgoing} → ${p.incoming}</td>
-      <td>${p.project}</td>
-      <td>${getTaskCount(p.id)}</td>
+      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;max-width:180px;">
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${p.progress}%;"></div></div>
           <span style="font-size:11px;color:var(--color-text-tertiary);min-width:26px;">${p.progress}%</span>
         </div>
       </td>
-      <td>${classifyPlanStatus(p)}</td>
-      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
-      <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-sm" onclick="openPlan(${p.id})">Open</button>
-          <button class="btn btn-sm" style="color:#a32d2d;" onclick="deletePlan(${p.id})">Del</button>
-          <button class="btn btn-sm" onclick="editPlan(${p.id})">Edit</button>
-        </div>
-      </td>
     </tr>
-  `).join('') : `<tr><td colspan="7" style="color:var(--color-text-secondary);">No ongoing plans.</td></tr>`;
+  `).join('') : `<tr><td colspan="9" style="color:var(--color-text-secondary);">No scheduled plans.</td></tr>`;
 
-  completedBody.innerHTML = completed.length ? completed.map(p => `
+  ongoingBody.innerHTML = ongoing.length ? ongoing.map(p => `
     <tr>
-      <td>${p.outgoing} → ${p.incoming}</td>
       <td>${p.project}</td>
       <td>${p.start}</td>
       <td>${p.end}</td>
@@ -1442,8 +1516,39 @@ function renderPlansPanel() {
           <button class="btn btn-sm" onclick="editPlan(${p.id})">Edit</button>
         </div>
       </td>
+      <td><button class="btn btn-sm" onclick="openPlanTaskModal(${p.id})">Add</button></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;max-width:180px;">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${p.progress}%;"></div></div>
+          <span style="font-size:11px;color:var(--color-text-tertiary);min-width:26px;">${p.progress}%</span>
+        </div>
+      </td>
     </tr>
-  `).join('') : `<tr><td colspan="7" style="color:var(--color-text-secondary);">No completed plans.</td></tr>`;
+  `).join('') : `<tr><td colspan="9" style="color:var(--color-text-secondary);">No ongoing plans.</td></tr>`;
+
+  completedBody.innerHTML = completed.length ? completed.map(p => `
+    <tr>
+      <td>${p.project}</td>
+      <td>${p.start}</td>
+      <td>${p.end}</td>
+      <td>${getTaskCount(p.id)}</td>
+      <td>${classifyPlanStatus(p)}</td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="openPlan(${p.id})">Open</button>
+          <button class="btn btn-sm" style="color:#a32d2d;" onclick="deletePlan(${p.id})">Del</button>
+          <button class="btn btn-sm" onclick="editPlan(${p.id})">Edit</button>
+        </div>
+      </td>
+      <td></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;max-width:180px;">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%;background:#639922;"></div></div>
+          <span style="font-size:11px;color:var(--color-text-tertiary);min-width:26px;">100%</span>
+        </div>
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="9" style="color:var(--color-text-secondary);">No completed plans.</td></tr>`;
 
 
 
@@ -1554,8 +1659,14 @@ function updateTrackerVisibility() {
   const demoBtn = document.getElementById('demoBtn');
   const exportBtn = document.getElementById('exportPlanBtn');
   const headerDemoLabel = document.getElementById('headerDemoLabel');
+  const saveBackupBtn = document.getElementById('saveBackupBtn');
+  const loadBackupBtn = document.getElementById('loadBackupBtn');
   const plansTab = document.querySelector('.tab[data-tab="plans"]');
   const trackerTabs = Array.from(document.querySelectorAll('.tab[data-tab="tasks"], .tab[data-tab="daily"], .tab[data-tab="progress"]'));
+
+  // Hide Save/Load Backup in Demo mode
+  if (saveBackupBtn) saveBackupBtn.style.display = isDemoMode ? 'none' : '';
+  if (loadBackupBtn) loadBackupBtn.style.display = isDemoMode ? 'none' : '';
 
   if(headerDemoLabel) {
     if(isDemoMode) headerDemoLabel.classList.remove('hidden');

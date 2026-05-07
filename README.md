@@ -1,4 +1,5 @@
-# SA Resource Transition Plan Tracker
+
+# Architect Transition & Handover Management Tool
 
 A lightweight single-file HTML app for planning and tracking structured onboarding and handover work between an outgoing and incoming Solutions Architect.
 
@@ -23,8 +24,9 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 
 ## Repository contents
 
-- `Resource_transition_plan_tracker.html` — main application UI and logic
-- `AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
+-`Resource_transition_plan_tracker.html` — main application UI and logic
+
+-`AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
 
 ## Tech stack
 
@@ -88,5 +90,7 @@ This project is a standalone browser app, so there is currently **no automated t
 ## Author
 
 **DJ Rajasekar**
+
 [LinkedIn](https://www.linkedin.com/in/djrajasekar/)
+
 [GitHub](https://github.com/djrajasekar)

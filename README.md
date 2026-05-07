@@ -2,6 +2,25 @@
 
 A lightweight single-file HTML app for planning and tracking structured onboarding and handover work between an outgoing and incoming Solutions Architect.
 
+## Current Features
+
+- Configurable `1–8` week transition plans
+- Editable weekly focus and week descriptions
+- Plan edit/delete support
+- Autosave for active plan metadata and daily notes
+- Full backup and restore for all plans, tasks, weekly descriptions, and day notes
+- Task counts and separated scheduled / ongoing / completed sections
+- Day-by-day task tracker and progress charts
+- Demo screen aligned with the latest workflow changes
+
+## Screenshots
+
+![1778175632218](image/README/1778175632218.png)
+
+![1778175753609](image/README/1778175753609.png)
+
+![1778175807907](image/README/1778175807907.png)
+
 ## Repository contents
 
 - `Resource_transition_plan_tracker.html` — main application UI and logic

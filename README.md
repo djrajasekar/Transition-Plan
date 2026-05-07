@@ -89,8 +89,5 @@ This project is a standalone browser app, so there is currently **no automated t
 
 ## Author
 
-**DJ Rajasekar**
-
-[LinkedIn](https://www.linkedin.com/in/djrajasekar/)
-
-[GitHub](https://github.com/djrajasekar)
+**DJ Rajasekar**  
+🔗 [LinkedIn](https://www.linkedin.com/in/rajasekar-dj) &nbsp;|&nbsp; 💻 [GitHub](https://github.com/djrajasekar)

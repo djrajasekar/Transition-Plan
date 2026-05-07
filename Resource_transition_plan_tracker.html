@@ -356,6 +356,7 @@
       <table class="mini-table">
         <thead>
           <tr>
+            <th style="min-width:140px;">Resource</th>
             <th style="min-width:120px;">Project</th>
             <th style="min-width:90px;">Start</th>
             <th style="min-width:90px;">End</th>
@@ -376,6 +377,7 @@
       <table class="mini-table">
         <thead>
           <tr>
+            <th style="min-width:140px;">Resource</th>
             <th style="min-width:120px;">Project</th>
             <th style="min-width:90px;">Start</th>
             <th style="min-width:90px;">End</th>
@@ -397,6 +399,7 @@
         <table class="mini-table">
           <thead>
             <tr>
+              <th style="min-width:140px;">Resource</th>
               <th style="min-width:120px;">Project</th>
               <th style="min-width:90px;">Start</th>
               <th style="min-width:90px;">End</th>
@@ -1480,6 +1483,7 @@ function renderPlansPanel() {
 
   scheduledBody.innerHTML = scheduled.length ? scheduled.map(p => `
     <tr>
+      <td>${p.outgoing} → ${p.incoming}</td>
       <td>${p.project}</td>
       <td>${p.start}</td>
       <td>${p.end}</td>
@@ -1504,6 +1508,7 @@ function renderPlansPanel() {
 
   ongoingBody.innerHTML = ongoing.length ? ongoing.map(p => `
     <tr>
+      <td>${p.outgoing} → ${p.incoming}</td>
       <td>${p.project}</td>
       <td>${p.start}</td>
       <td>${p.end}</td>
@@ -1528,6 +1533,7 @@ function renderPlansPanel() {
 
   completedBody.innerHTML = completed.length ? completed.map(p => `
     <tr>
+      <td>${p.outgoing} → ${p.incoming}</td>
       <td>${p.project}</td>
       <td>${p.start}</td>
       <td>${p.end}</td>

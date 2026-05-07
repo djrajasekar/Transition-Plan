@@ -1,5 +1,6 @@
 
-# Architect Transition & Handover Management Tool
+
+# Standalone Knowledge Transition Monitoring Application
 
 A lightweight single-file HTML app for planning and tracking structured onboarding and handover work between an outgoing and incoming Solutions Architect.
 

@@ -136,6 +136,84 @@
     color: #fff;
     opacity: 1;
   }
+
+    .btn-save-backup {
+      background: linear-gradient(135deg, #378add 60%, #5bb6ff 100%);
+      color: #fff;
+      border-color: transparent;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(55,138,221,0.10);
+    }
+    .btn-save-backup:hover {
+      background: linear-gradient(135deg, #2c6bb2 60%, #379fff 100%);
+      color: #fff;
+      opacity: 1;
+    }
+
+      .btn-load-backup {
+        background: linear-gradient(135deg, #1d9e75 60%, #4be3b7 100%);
+        color: #fff;
+        border-color: transparent;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(29,158,117,0.10);
+      }
+      .btn-load-backup:hover {
+        background: linear-gradient(135deg, #157a5c 60%, #2fd6a2 100%);
+        color: #fff;
+        opacity: 1;
+      }
+
+        .btn-demo {
+          background: linear-gradient(135deg, #f7b731 60%, #f5cd79 100%);
+          color: #342722;
+          border-color: transparent;
+          font-weight: 600;
+          box-shadow: 0 4px 14px rgba(247,183,49,0.10);
+        }
+        .btn-demo:hover {
+          background: linear-gradient(135deg, #e2a800 60%, #ffe082 100%);
+          color: #342722;
+          opacity: 1;
+        }
+
+          .btn-home {
+            background: linear-gradient(135deg, #a259c6 60%, #d3a5e6 100%);
+            color: #fff;
+            border-color: transparent;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(162,89,198,0.10);
+          }
+          .btn-home:hover {
+            background: linear-gradient(135deg, #7c3fa0 60%, #e0c3fc 100%);
+            color: #fff;
+            opacity: 1;
+          }
+
+            .btn-export-plan {
+              background: linear-gradient(135deg, #6c5ce7 60%, #a29bfe 100%);
+              color: #fff;
+              border-color: transparent;
+              font-weight: 600;
+              box-shadow: 0 4px 14px rgba(108,92,231,0.10);
+            }
+            .btn-export-plan:hover {
+              background: linear-gradient(135deg, #4834d4 60%, #d6e0ff 100%);
+              color: #fff;
+              opacity: 1;
+            }
+
+            .btn-back-to-plans {
+              background: linear-gradient(135deg, #fdcb6e 60%, #ffeaa7 100%);
+              color: #342722;
+              border-color: transparent;
+              font-weight: 600;
+              box-shadow: 0 4px 14px rgba(253,203,110,0.10);
+            }
+            .btn-back-to-plans:hover {
+              background: linear-gradient(135deg, #e1b12c 60%, #fff9e3 100%);
+              color: #342722;
+              opacity: 1;
+            }
   .btn-sm { padding: 4px 10px; font-size: 12px; }
   .table-wrap { overflow-x: auto; background: rgba(255,255,255,0.92); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); box-shadow: 0 10px 24px rgba(52,39,34,0.06); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -252,12 +330,12 @@
     </div>
     <div id="headerDemoLabel" class="header-watermark hidden">Demo</div>
     <div class="header-actions">
-      <button id="homeBtn" class="btn btn-sm hidden" onclick="goHome()">Home</button>
-      <button id="demoBtn" class="btn btn-sm" onclick="openDemoWindow()">Demo</button>
-      <button id="saveBackupBtn" class="btn btn-sm" onclick="downloadBackupFile()">Save Backup</button>
-      <button id="loadBackupBtn" class="btn btn-sm" onclick="openBackupFilePicker()">Load Backup</button>
-      <button id="exportPlanBtn" class="btn btn-sm hidden" onclick="exportCurrentPlanHtml()">Export Plan</button>
-      <button id="backToPlansBtn" class="btn btn-sm hidden" onclick="backToPlans()">Back to Plans</button>
+      <button id="homeBtn" class="btn btn-sm btn-home hidden" onclick="goHome()">Home</button>
+      <button id="demoBtn" class="btn btn-sm btn-demo" onclick="openDemoWindow()">Demo</button>
+      <button id="saveBackupBtn" class="btn btn-sm btn-save-backup" onclick="downloadBackupFile()">Save Backup</button>
+      <button id="loadBackupBtn" class="btn btn-sm btn-load-backup" onclick="openBackupFilePicker()">Load Backup</button>
+      <button id="exportPlanBtn" class="btn btn-sm btn-export-plan hidden" onclick="exportCurrentPlanHtml()">Export Plan</button>
+      <button id="backToPlansBtn" class="btn btn-sm btn-back-to-plans hidden" onclick="backToPlans()">Back to Plans</button>
     </div>
   </div>
   <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)" />
@@ -1662,11 +1740,30 @@ function updateTrackerVisibility() {
   const metaRow = document.getElementById('trackerMetaRow');
   const backBtn = document.getElementById('backToPlansBtn');
   const homeBtn = document.getElementById('homeBtn');
+  if (homeBtn && !homeBtn.classList.contains('btn-home')) {
+    homeBtn.classList.add('btn-home');
+  }
   const demoBtn = document.getElementById('demoBtn');
+  if (demoBtn && !demoBtn.classList.contains('btn-demo')) {
+    demoBtn.classList.add('btn-demo');
+  }
   const exportBtn = document.getElementById('exportPlanBtn');
+  if (exportBtn && !exportBtn.classList.contains('btn-export-plan')) {
+    exportBtn.classList.add('btn-export-plan');
+  }
+  const backToPlansBtn = document.getElementById('backToPlansBtn');
+  if (backToPlansBtn && !backToPlansBtn.classList.contains('btn-back-to-plans')) {
+    backToPlansBtn.classList.add('btn-back-to-plans');
+  }
   const headerDemoLabel = document.getElementById('headerDemoLabel');
   const saveBackupBtn = document.getElementById('saveBackupBtn');
+  if (saveBackupBtn && !saveBackupBtn.classList.contains('btn-save-backup')) {
+    saveBackupBtn.classList.add('btn-save-backup');
+  }
   const loadBackupBtn = document.getElementById('loadBackupBtn');
+  if (loadBackupBtn && !loadBackupBtn.classList.contains('btn-load-backup')) {
+    loadBackupBtn.classList.add('btn-load-backup');
+  }
   const plansTab = document.querySelector('.tab[data-tab="plans"]');
   const trackerTabs = Array.from(document.querySelectorAll('.tab[data-tab="tasks"], .tab[data-tab="daily"], .tab[data-tab="progress"]'));
 

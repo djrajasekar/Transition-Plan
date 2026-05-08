@@ -1,6 +1,6 @@
 # Standalone Knowledge Transition Monitoring Application
 
-A lightweight single-file HTML app for planning and tracking structured onboarding and handover work between an outgoing and incoming Solutions Architect.
+A lightweight single-file HTML app for visually planning, tracking, and managing structured knowledge transitions. Ideal for onboarding, handovers, and project transitions, it helps teams organize tasks, monitor progress, and ensure a smooth transfer of responsibilities - all in a portable, easy-to-use format.
 
 ## Current Features
 
@@ -13,13 +13,17 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 - Day-by-day task tracker and progress charts
 - Demo screen aligned with the latest workflow changes
 
-## Screenshots
+## Feature Highlights
 
-![1778175632218](image/README/1778175632218.png)
-
-![1778175753609](image/README/1778175753609.png)
-
-![1778176051758](image/README/1778176051758.png)
+<p align="center">
+	<img src="image/Dashboard.png" alt="Dashboard" width="600" />
+	<br><br>
+	<img src="image/Plan%20Dashboard.png" alt="Plan Dashboard" width="600" />
+	<br><br>
+	<img src="image/Task%20List.png" alt="Task List" width="600" />
+	<br><br>
+	<img src="image/Export%20Plan.png" alt="Export Plan" width="600" />
+</p>
 
 ## Repository contents
 

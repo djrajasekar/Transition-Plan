@@ -856,15 +856,40 @@ function getWeekRangeLabel(startValue, endValue, index) {
   return `${weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 }
 
+
+// Helper: Add weekdays only (skip weekends)
+function addWeekdays(startDate, daysToAdd) {
+  let date = new Date(startDate);
+  let added = 0;
+  while (added < daysToAdd) {
+    date.setDate(date.getDate() + 1);
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 0 = Sunday, 6 = Saturday
+      added++;
+    }
+  }
+  return date;
+}
+
+// Set end date based on number of weeks, counting only weekdays (Monday to Friday)
 function syncPlanEndDateFromWeeks() {
   const startValue = document.getElementById('p-start')?.value;
   const weeks = clampWeekCount(document.getElementById('p-weeks')?.value);
   const endInput = document.getElementById('p-end');
   if(!startValue || !endInput) return;
 
-  const endDate = toDate(startValue);
-  endDate.setDate(endDate.getDate() + (weeks * 7) - 1);
-  endInput.value = formatDateInputValue(endDate);
+  // 1 week = 5 weekdays, 2 weeks = 10 weekdays, etc.
+  const totalWeekdays = weeks * 5;
+  let date = new Date(startValue);
+  let added = 0;
+  while (added < totalWeekdays - 1) { // -1 because start is day 1
+    date.setDate(date.getDate() + 1);
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      added++;
+    }
+  }
+  endInput.value = formatDateInputValue(date);
 }
 
 function getSetupWeekDrafts() {
@@ -2146,12 +2171,22 @@ function updateTaskField(id, field, value) {
   renderAll();
 }
 
+
 function renderDaily() {
   const grid = document.getElementById('dayGrid');
   const maxDay = Math.max(...tasks.map(t=>t.day), 1);
-  const days = Array.from({length: maxDay}, (_, i) => i + 1);
+  // Only include days that map to weekdays (Mon-Fri)
+  const days = [];
+  for (let d = 1; d <= maxDay; d++) {
+    const dateStr = getDateForDay(d);
+    const dateObj = new Date(dateStr);
+    const dayOfWeek = dateObj.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      days.push(d);
+    }
+  }
   const today = getTodayDay(maxDay);
-  if(!selectedDay || !days.includes(selectedDay)) selectedDay = today;
+  if(!selectedDay || !days.includes(selectedDay)) selectedDay = days[0] || 1;
 
   const daySelect = document.getElementById('dailyDaySelect');
   if(daySelect) {
@@ -2199,18 +2234,36 @@ function setDailyNote(value) {
   persistAppState();
 }
 
+
+// Map plan day (1-based, only weekdays) to actual date
 function getDateForDay(day) {
   const startInput = document.getElementById('m-start');
   const startVal = (startInput && startInput.value) ? startInput.value : '2026-04-07';
   const [y, m, d] = startVal.split('-').map(Number);
   const startDate = new Date(y, m - 1, d);
-  startDate.setDate(startDate.getDate() + Math.max(0, day - 1));
-  const yy = startDate.getFullYear();
-  const mm = String(startDate.getMonth() + 1).padStart(2, '0');
-  const dd = String(startDate.getDate()).padStart(2, '0');
+  if (day <= 1) return startVal;
+  // Add (day-1) weekdays to startDate
+  const resultDate = addWeekdays(startDate, day - 1);
+  const yy = resultDate.getFullYear();
+  const mm = String(resultDate.getMonth() + 1).padStart(2, '0');
+  const dd = String(resultDate.getDate()).padStart(2, '0');
   return `${yy}-${mm}-${dd}`;
 }
 
+
+// Helper: Count weekdays between two dates (inclusive)
+function countWeekdaysBetween(startDate, endDate) {
+  let count = 0;
+  let date = new Date(startDate);
+  while (date <= endDate) {
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) count++;
+    date.setDate(date.getDate() + 1);
+  }
+  return count;
+}
+
+// Map today to plan day (1-based, only weekdays)
 function getTodayDay(maxDay) {
   const startInput = document.getElementById('m-start');
   const startVal = (startInput && startInput.value) ? startInput.value : '2026-04-07';
@@ -2219,11 +2272,15 @@ function getTodayDay(maxDay) {
 
   const now = new Date();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diffDays = Math.floor((todayDate - startDate) / 86400000) + 1;
-
-  return Math.min(maxDay, Math.max(1, diffDays));
+  let planDay = 1;
+  if (todayDate >= startDate) {
+    planDay = countWeekdaysBetween(startDate, todayDate);
+  }
+  return Math.min(maxDay, Math.max(1, planDay));
 }
 
+
+// Map a selected date to the corresponding plan day (weekdays only)
 function onDailyDateChange(value) {
   if(!value) return;
   const startVal = document.getElementById('m-start').value;
@@ -2233,9 +2290,12 @@ function onDailyDateChange(value) {
   const [vy, vm, vd] = value.split('-').map(Number);
   const startDate = new Date(sy, sm - 1, sd);
   const selectedDate = new Date(vy, vm - 1, vd);
-  const diffDays = Math.floor((selectedDate - startDate) / 86400000) + 1;
+  let planDay = 1;
+  if (selectedDate >= startDate) {
+    planDay = countWeekdaysBetween(startDate, selectedDate);
+  }
   const maxDay = Math.max(...tasks.map(t=>t.day), 1);
-  const boundedDay = Math.min(maxDay, Math.max(1, diffDays));
+  const boundedDay = Math.min(maxDay, Math.max(1, planDay));
   setSelectedDay(boundedDay);
 }
 

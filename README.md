@@ -2,15 +2,16 @@
 
 A lightweight single-file HTML app for visually planning, tracking, and managing structured knowledge transitions. Ideal for onboarding, handovers, and project transitions, it helps teams organize tasks, monitor progress, and ensure a smooth transfer of responsibilities - all in a portable, easy-to-use format.
 
+
 ## Current Features
 
-- Configurable `1–8` week transition plans
+- Configurable `1–8` week transition plans (all durations and scheduling count only weekdays, Monday–Friday)
 - Editable weekly focus and week descriptions
 - Plan edit/delete support
 - Autosave for active plan metadata and daily notes
 - Full backup and restore for all plans, tasks, weekly descriptions, and day notes
 - Task counts and separated scheduled / ongoing / completed sections
-- Day-by-day task tracker and progress charts
+- Day-by-day task tracker and progress charts (weekends are hidden; only weekdays are shown)
 - Demo screen aligned with the latest workflow changes
 
 ## Feature Highlights
@@ -25,11 +26,11 @@ A lightweight single-file HTML app for visually planning, tracking, and managing
 	<img src="image/Export%20Plan.png" alt="Export Plan" width="600" />
 </p>
 
+
 ## Repository contents
 
--`Resource_transition_plan_tracker.html` — main application UI and logic
-
--`AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
+- `Resource_transition_plan_tracker.html` — main application UI and logic (all plan, scheduling, and tracker logic is weekday-based)
+- `AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
 
 ## Tech stack
 
@@ -55,18 +56,21 @@ A lightweight single-file HTML app for visually planning, tracking, and managing
 
 This project is a standalone browser app, so there is currently **no automated test runner configured**. The recommended validation approach is a focused manual smoke test.
 
+
 ### Happy path checks
 
-- create a new `2-week` plan and verify the week cards appear immediately
+- create a new `2-week` plan and verify only 10 weekdays are included (weekends are skipped in all calculations)
 - open the plan and add a task; confirm the task count increases in the plans table
 - edit the plan and confirm the updated values persist
 - launch `Demo` and confirm scheduled, ongoing, and completed plans are visible
 
+
 ### Edge case checks
 
-- change the number of weeks from `1` to `8` and verify the end date/day limits update
+- change the number of weeks from `1` to `8` and verify the end date/day limits update (all durations are based on weekdays only)
 - switch a week from `Use suggested text` to `Change it` and save custom content
 - confirm task phase options only show the generated weeks for the selected plan
+- verify that the Day-by-day tracker never shows a weekend day (Saturday/Sunday)
 
 ### Error handling checks
 

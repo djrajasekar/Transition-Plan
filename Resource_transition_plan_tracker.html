@@ -330,6 +330,7 @@
       <button id="loadBackupBtn" class="btn btn-sm btn-load-backup" onclick="openBackupFilePicker()">Load Backup</button>
       <button id="exportPlanBtn" class="btn btn-sm btn-export-plan hidden" onclick="exportCurrentPlanHtml()">Export Plan</button>
       <button id="backToPlansBtn" class="btn btn-sm btn-back-to-plans hidden" onclick="backToPlans()">Back to Plans</button>
+
     </div>
   </div>
   <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden" onchange="importBackupFile(event)" />
@@ -348,7 +349,7 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="plans" onclick="switchTab('plans',this)">Plans</button>
+    <button class="tab active" data-tab="plans" onclick="switchTab('plans',this)">Dashboard</button>
     <button class="tab hidden" data-tab="progress" onclick="switchTab('progress',this)">Progress &amp; charts</button>
     <button class="tab hidden" data-tab="tasks" onclick="switchTab('tasks',this)">Task list</button>
     <button class="tab hidden" data-tab="daily" onclick="switchTab('daily',this)">Day-by-day</button>
@@ -1558,7 +1559,15 @@ function renderPlansPanel() {
 
   const today = toDate(todayIso());
   const scheduled = plans.filter(p => toDate(p.start) > today);
-  const ongoing = plans.filter(p => toDate(p.start) <= today && toDate(p.end) >= today && p.status !== 'Completed');
+  // Only show plans as ongoing if their status is 'In Progress' or 'On Hold'
+  const ongoing = plans.filter(p => {
+    const statusNorm = (p.status || '').trim().toLowerCase();
+    return (
+      toDate(p.start) <= today &&
+      toDate(p.end) >= today &&
+      (statusNorm === 'in progress' || statusNorm === 'inprogress' || statusNorm === 'on hold' || statusNorm === 'onhold')
+    );
+  });
   const completed = plans.filter(p => classifyPlanStatus(p) === 'Completed');
 
   if(ongoingSection) {
@@ -1645,25 +1654,44 @@ function renderPlansPanel() {
 
 
 
-  // Use both ongoing and completed plans for the chart
-  const chartPlans = [...ongoing, ...completed];
-  const statusCounts = { 'In Progress': 0, 'On Hold': 0, 'Overdue': 0, 'Completed': 0 };
-  chartPlans.forEach(p => {
-    const status = classifyPlanStatus(p);
-    if(statusCounts[status] !== undefined) statusCounts[status] += 1;
+
+
+  // For the status chart, count all plans by their status (ignore date filtering)
+  const statusCounts = { 'Planning': 0, 'In Progress': 0, 'On Hold': 0, 'Completed': 0 };
+  const normalizeStatus = s => {
+    if (!s) return '';
+    const v = s.trim().toLowerCase();
+    if (v === 'planning') return 'Planning';
+    if (v === 'in progress' || v === 'inprogress') return 'In Progress';
+    if (v === 'on hold' || v === 'onhold') return 'On Hold';
+    if (v === 'completed') return 'Completed';
+    return '';
+  };
+  plans.forEach(p => {
+    const norm = normalizeStatus(p.status);
+    if (statusCounts.hasOwnProperty(norm)) {
+      statusCounts[norm] += 1;
+    }
   });
 
-  const totalPlans = Object.values(statusCounts).reduce((sum, value) => sum + value, 0);
-  const chartLabels = totalPlans === 0 ? ['No plans'] : Object.keys(statusCounts);
-  const chartData = totalPlans === 0 ? [1] : Object.values(statusCounts);
-  const chartColors = totalPlans === 0 ? ['#D3D1C7'] : ['#378ADD', '#EF9F27', '#E24B4A', '#639922'];
+  // Always show all 4 statuses in the chart, even if some are zero
+  const chartLabels = Object.keys(statusCounts);
+  const chartData = Object.values(statusCounts);
+  const totalPlans = chartData.reduce((sum, value) => sum + value, 0);
+  // Chart color order: Planning, In Progress, On Hold, Completed
+  // Chart color order: Planning (yellow), In Progress (blue), On Hold (orange), Completed (green)
+  const chartColors = ['#FFD600', '#378ADD', '#EF9F27', '#639922'];
+  // If no plans, show a single gray segment
+  const displayLabels = totalPlans === 0 ? ['No plans'] : chartLabels;
+  const displayData = totalPlans === 0 ? [1] : chartData;
+  const displayColors = totalPlans === 0 ? ['#D3D1C7'] : chartColors;
 
   if(ongoingStatusChart) ongoingStatusChart.destroy();
   ongoingStatusChart = new Chart(document.getElementById('ongoingStatusChart'), {
     type: 'doughnut',
     data: {
-      labels: chartLabels,
-      datasets: [{ data: chartData, backgroundColor: chartColors, borderWidth: 0, borderRadius: 4 }]
+      labels: displayLabels,
+      datasets: [{ data: displayData, backgroundColor: displayColors, borderWidth: 0, borderRadius: 4 }]
     },
     options: {
       responsive: true,
@@ -2439,6 +2467,36 @@ document.getElementById('m-end').addEventListener('change', () => {
 document.getElementById('p-start').addEventListener('change', onPlanWeeksChange);
 document.getElementById('p-end').addEventListener('change', () => renderPlanSetupWeeks());
 window.addEventListener('beforeunload', () => persistAppState());
+// ********** Hidden/Orphaned Plans Cleanup **********
+function cleanupHiddenPlans() {
+  // A plan is considered visible if it appears in any of the three tables (scheduled, ongoing, completed)
+  const today = toDate(todayIso());
+  // Use the same logic as renderPlansPanel
+  const scheduled = plans.filter(p => toDate(p.start) > today);
+  const ongoing = plans.filter(p => toDate(p.start) <= today && toDate(p.end) >= today && p.status !== 'Completed');
+  const completed = plans.filter(p => classifyPlanStatus(p) === 'Completed');
+  const visibleIds = new Set([...scheduled, ...ongoing, ...completed].map(p => p.id));
+  const hiddenPlans = plans.filter(p => !visibleIds.has(p.id));
+  if (hiddenPlans.length === 0) {
+    alert('No hidden/orphaned plans found.');
+    return;
+  }
+  const msg = 'The following hidden/orphaned plans will be deleted:\n' +
+    hiddenPlans.map(p => `- ${p.outgoing} → ${p.incoming} (${p.project}, status: ${p.status})`).join('\n') +
+    '\n\nProceed?';
+  if (!confirm(msg)) return;
+  // Remove hidden plans and their tasks/notes
+  plans = plans.filter(p => visibleIds.has(p.id));
+  hiddenPlans.forEach(p => {
+    delete planTaskStore[p.id];
+    delete weeklyPlanStore[p.id];
+    delete dailyNotesStore[p.id];
+  });
+  persistAppState();
+  renderPlansPanel();
+  alert('Hidden/orphaned plans deleted.');
+}
+// ********** End Hidden/Orphaned Plans Cleanup **********
 </script>
 </body>
 </html>

@@ -1,5 +1,3 @@
-
-
 # Standalone Knowledge Transition Monitoring Application
 
 A lightweight single-file HTML app for planning and tracking structured onboarding and handover work between an outgoing and incoming Solutions Architect.
@@ -49,17 +47,6 @@ A lightweight single-file HTML app for planning and tracking structured onboardi
 6. Use `Save Backup` to download a full JSON backup of all plans and `Load Backup` to restore it later.
 7. Use `Export Plan` to download a portable HTML summary for the selected plan.
 
-## Current features
-
-- configurable `1–8` week transition plans
-- editable weekly focus and week descriptions
-- plan edit/delete support
-- autosave for active plan metadata and daily notes
-- full backup and restore for all plans, tasks, weekly descriptions, and day notes
-- task counts and separated scheduled / ongoing / completed sections
-- day-by-day task tracker and progress charts
-- demo screen aligned with the latest workflow changes
-
 ## Testing and validation
 
 This project is a standalone browser app, so there is currently **no automated test runner configured**. The recommended validation approach is a focused manual smoke test.
@@ -90,5 +77,5 @@ This project is a standalone browser app, so there is currently **no automated t
 
 ## Author
 
-**DJ Rajasekar**  
+**DJ Rajasekar**
 🔗 [LinkedIn](https://www.linkedin.com/in/rajasekar-dj) &nbsp;|&nbsp; 💻 [GitHub](https://github.com/djrajasekar)

@@ -44,13 +44,14 @@ A lightweight single-file HTML app for visually planning, tracking, and managing
 
 ## How to use
 
-1. Open `Resource_transition_plan_tracker.html` in a browser.
-2. Create a transition plan with outgoing/incoming SA names, project, dates, and number of weeks.
-3. Review the suggested weekly descriptions and change them where needed.
-4. Open a plan to manage tasks, day-by-day tracking, and progress charts.
-5. Use `Demo` to preview the latest sample data and screen behavior.
-6. Use `Save Backup` to download a full JSON backup of all plans and `Load Backup` to restore it later.
-7. Use `Export Plan` to download a portable HTML summary for the selected plan.
+1. Download `Resource_transition_plan_tracker.html` from the repository and save it to your local machine.
+2. Open the saved HTML file in your browser.
+3. Create a transition plan by specifying the current and new owner (or team member), project, dates, and number of weeks.
+4. Review the suggested weekly descriptions and change them where needed.
+5. Open a plan to manage tasks, day-by-day tracking, and progress charts.
+6. Use `Demo` to preview the latest sample data and screen behavior.
+7. Use `Save Backup` to download a full JSON backup of all plans and `Load Backup` to restore it later.
+8. Use `Export Plan` to download a portable HTML summary for the selected plan.
 
 ## Testing and validation
 

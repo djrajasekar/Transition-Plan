@@ -2,7 +2,6 @@
 
 A lightweight single-file HTML app for visually planning, tracking, and managing structured knowledge transitions. Ideal for onboarding, handovers, and project transitions, it helps teams organize tasks, monitor progress, and ensure a smooth transfer of responsibilities - all in a portable, easy-to-use format.
 
-
 ## Current Features
 
 - Configurable `1–8` week transition plans (all durations and scheduling count only weekdays, Monday–Friday)
@@ -25,7 +24,6 @@ A lightweight single-file HTML app for visually planning, tracking, and managing
 	<br><br>
 	<img src="image/Export%20Plan.png" alt="Export Plan" width="600" />
 </p>
-
 
 ## Repository contents
 
@@ -57,14 +55,12 @@ A lightweight single-file HTML app for visually planning, tracking, and managing
 
 This project is a standalone browser app, so there is currently **no automated test runner configured**. The recommended validation approach is a focused manual smoke test.
 
-
 ### Happy path checks
 
 - create a new `2-week` plan and verify only 10 weekdays are included (weekends are skipped in all calculations)
 - open the plan and add a task; confirm the task count increases in the plans table
 - edit the plan and confirm the updated values persist
 - launch `Demo` and confirm scheduled, ongoing, and completed plans are visible
-
 
 ### Edge case checks
 

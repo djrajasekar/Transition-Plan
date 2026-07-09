@@ -1,86 +1,93 @@
-# Standalone Knowledge Transition Monitoring Application
+# Knowledge Transition Plan Tracker
 
-A lightweight single-file HTML app for visually planning, tracking, and managing structured knowledge transitions. Ideal for onboarding, handovers, and project transitions, it helps teams organize tasks, monitor progress, and ensure a smooth transfer of responsibilities - all in a portable, easy-to-use format.
+A standalone browser-based HTML application for planning and tracking structured knowledge transitions. It is designed for onboarding, handovers, and ownership transfer scenarios where teams need clear week-by-week tracking, task visibility, and simple backup/restore support.
 
-## Current Features
+## Overview
 
-- Configurable `1–8` week transition plans (all durations and scheduling count only weekdays, Monday–Friday)
-- Editable weekly focus and week descriptions
-- Plan edit/delete support
-- Autosave for active plan metadata and daily notes
-- Full backup and restore for all plans, tasks, weekly descriptions, and day notes
-- Task counts and separated scheduled / ongoing / completed sections
-- Day-by-day task tracker and progress charts (weekends are hidden; only weekdays are shown)
-- Demo screen aligned with the latest workflow changes
+The application runs fully in the browser with no backend and no build step. It stores data locally and allows export/import of plan data for portability.
 
-## Feature Highlights
+## Key capabilities
+
+- Create transition plans for 1 to 8 weeks.
+- Weekday-only scheduling logic (Monday to Friday).
+- Edit and delete plans.
+- Manage week descriptions with suggested or custom text.
+- Track tasks by status and phase/week.
+- View day-by-day task progress (weekends excluded).
+- Visualize progress with charts.
+- Use demo mode to load sample workflow data.
+- Export and import full backups in JSON format.
+- Export a portable HTML plan summary.
+
+## Project structure
+
+- `Resource_transition_plan_tracker.html`: Main application UI, styling, and JavaScript logic.
+- `README.md`: Project documentation.
+- `AGENTS.md`: Repository-level guidance for contributors and coding agents.
+- `image/`: Screenshots used in documentation.
+- `Design/`: Design artifacts.
+- `Presentation/`: Presentation materials.
+
+## Screenshots
 
 <p align="center">
-	<img src="image/Dashboard.png" alt="Dashboard" width="600" />
-	<br><br>
-	<img src="image/Plan%20Dashboard.png" alt="Plan Dashboard" width="600" />
-	<br><br>
-	<img src="image/Task%20List.png" alt="Task List" width="600" />
-	<br><br>
-	<img src="image/Export%20Plan.png" alt="Export Plan" width="600" />
+  <img src="image/Dashboard.png" alt="Dashboard" width="600" />
+  <br><br>
+  <img src="image/Plan%20Dashboard.png" alt="Plan Dashboard" width="600" />
+  <br><br>
+  <img src="image/Task%20List.png" alt="Task List" width="600" />
+  <br><br>
+  <img src="image/Export%20Plan.png" alt="Export Plan" width="600" />
 </p>
 
-## Repository contents
+## Quick start
 
-- `Resource_transition_plan_tracker.html` — main application UI and logic (all plan, scheduling, and tracker logic is weekday-based)
-- `AGENTS.md` — repository guidance for documentation, comments, validation, and safe changes
+1. Open `Resource_transition_plan_tracker.html` in a modern browser.
+2. Create a new transition plan with owner details, project details, and duration.
+3. Update weekly descriptions if needed.
+4. Add and manage tasks from the plan dashboard.
+5. Use Demo to preview sample behavior.
+6. Use Save Backup and Load Backup to move or restore all plan data.
+7. Use Export Plan to generate a shareable HTML summary.
 
-## Tech stack
+## Data and persistence
 
-- HTML5 single-page application
-- CSS3 with responsive layout, theme variables, gradients, and component styling
-- Vanilla JavaScript (ES6+) for state management, form handling, rendering, and export flows
-- Browser `localStorage` for client-side persistence
-- JSON backup export/import for portable persistence across browser restarts or storage resets
-- Chart.js for progress and status visualizations
-- No backend service, package manager, or build step required
+- Plan and tracker data are stored in browser `localStorage`.
+- Backups are exported/imported as JSON.
+- No server-side storage is used.
 
-## How to use
+## Validation guide
 
-1. Download `Resource_transition_plan_tracker.html` from the repository and save it to your local machine.
-2. Open the saved HTML file in your browser.
-3. Create a transition plan by specifying the current and new owner (or team member), project, dates, and number of weeks.
-4. Review the suggested weekly descriptions and change them where needed.
-5. Open a plan to manage tasks, day-by-day tracking, and progress charts.
-6. Use `Demo` to preview the latest sample data and screen behavior.
-7. Use `Save Backup` to download a full JSON backup of all plans and `Load Backup` to restore it later.
-8. Use `Export Plan` to download a portable HTML summary for the selected plan.
+There is no automated test framework configured for this standalone HTML app. Recommended validation is manual smoke testing.
 
-## Testing and validation
+### Happy path
 
-This project is a standalone browser app, so there is currently **no automated test runner configured**. The recommended validation approach is a focused manual smoke test.
+- Create a 2-week plan and confirm only 10 weekdays are generated.
+- Add tasks and confirm counts update on the dashboard.
+- Edit an existing plan and confirm values persist.
+- Run Demo and verify scheduled, ongoing, and completed examples appear.
 
-### Happy path checks
+### Edge cases
 
-- create a new `2-week` plan and verify only 10 weekdays are included (weekends are skipped in all calculations)
-- open the plan and add a task; confirm the task count increases in the plans table
-- edit the plan and confirm the updated values persist
-- launch `Demo` and confirm scheduled, ongoing, and completed plans are visible
+- Change duration from 1 to 8 weeks and verify weekday-based end-date updates.
+- Override a suggested week description with custom text and save.
+- Confirm task phase/week options are limited to generated weeks.
+- Confirm day-by-day tracker excludes Saturday and Sunday.
 
-### Edge case checks
+### Error handling
 
-- change the number of weeks from `1` to `8` and verify the end date/day limits update (all durations are based on weekdays only)
-- switch a week from `Use suggested text` to `Change it` and save custom content
-- confirm task phase options only show the generated weeks for the selected plan
-- verify that the Day-by-day tracker never shows a weekend day (Saturday/Sunday)
+- Save a plan with missing required fields and verify validation appears.
+- Enter an end date earlier than start date and verify validation appears.
+- Add a task without a task name and verify validation appears.
 
-### Error handling checks
+## Known limitations
 
-- try saving a plan with missing required fields and confirm the validation alert appears
-- try using an end date earlier than the start date and confirm the date validation alert appears
-- try adding a task without a task name and confirm the validation alert appears
-
-## Verified status
-
-- VS Code error check for `Resource_transition_plan_tracker.html`: **No errors found**
-- Validation date: `2026-04-06`
+- Data is browser-local unless exported.
+- Clearing browser storage removes unsaved local data.
+- Multi-user collaboration is not supported in this standalone version.
 
 ## Author
 
-**DJ Rajasekar**
-🔗 [LinkedIn](https://www.linkedin.com/in/rajasekar-dj) &nbsp;|&nbsp; 💻 [GitHub](https://github.com/djrajasekar)
+DJ Rajasekar  
+LinkedIn: [https://www.linkedin.com/in/rajasekar-dj](https://www.linkedin.com/in/rajasekar-dj)  
+GitHub: [https://github.com/djrajasekar](https://github.com/djrajasekar)
